@@ -4,253 +4,54 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Log Masuk - nspace</title>
-  <!-- Supabase JS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: #F7F4EC;
-      color: #2D3748;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
-
-    .login-wrapper {
-      background: #FFFFFF;
-      width: 100%;
-      max-width: 880px;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-
-    @media (min-width: 768px) {
-      .login-wrapper {
-        flex-direction: row;
-      }
-    }
-
-    /* Bahagian Grafik Gambar Basikal */
-    .graphic-section {
-      background-color: #3F6C51;
-      background-image: url('https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=800&q=80');
-      background-size: cover;
-      background-position: center;
-      min-height: 220px;
-      position: relative;
-      display: flex;
-      align-items: flex-end;
-      padding: 24px;
-    }
-
-    @media (min-width: 768px) {
-      .graphic-section {
-        width: 50%;
-        min-height: 480px;
-      }
-    }
-
-    .graphic-overlay {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.6) 100%);
-    }
-
-    .graphic-text {
-      position: relative;
-      z-index: 1;
-      color: #FFFFFF;
-    }
-
-    .graphic-text h3 {
-      font-size: 1.5rem;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-
-    .graphic-text p {
-      font-size: 0.875rem;
-      opacity: 0.9;
-    }
-
-    /* Bahagian Borang Log Masuk */
-    .form-section {
-      padding: 32px 24px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    @media (min-width: 768px) {
-      .form-section {
-        width: 50%;
-        padding: 48px;
-      }
-    }
-
-    .brand-title {
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: #1A202C;
-      margin-bottom: 8px;
-    }
-
-    .brand-subtitle {
-      font-size: 0.875rem;
-      color: #718096;
-      margin-bottom: 28px;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: #4A5568;
-      margin-bottom: 6px;
-    }
-
-    .form-group input {
-      width: 100%;
-      padding: 12px 14px;
-      border: 1px solid #E2E8F0;
-      border-radius: 8px;
-      font-size: 1rem;
-      background-color: #FAFAFA;
-      transition: all 0.2s ease;
-      -webkit-appearance: none; /* Kemas untuk iOS Safari */
-    }
-
-    .form-group input:focus {
-      outline: none;
-      border-color: #3F6C51;
-      background-color: #FFFFFF;
-      box-shadow: 0 0 0 3px rgba(63, 108, 81, 0.15);
-    }
-
-    .btn-submit {
-      width: 100%;
-      padding: 12px;
-      background-color: #3F6C51;
-      color: #FFFFFF;
-      font-size: 1rem;
-      font-weight: 600;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-      margin-top: 8px;
-    }
-
-    .btn-submit:hover {
-      background-color: #2F523D;
-    }
-
-    .btn-submit:disabled {
-      background-color: #A0AEC0;
-      cursor: not-allowed;
-    }
+    body { font-family: sans-serif; background: #F7F4EC; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+    .card { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); width: 100%; max-width: 360px; }
+    input, button { width: 100%; padding: 10px; margin-top: 8px; box-sizing: border-box; }
+    button { background: #3F6C51; color: white; border: none; border-radius: 4px; margin-top: 16px; cursor: pointer; }
   </style>
 </head>
 <body>
 
-  <div class="login-wrapper">
-    <!-- Kad Grafik (Gambar Basikal) -->
-    <div class="graphic-section">
-      <div class="graphic-overlay"></div>
-      <div class="graphic-text">
-        <h3>nspace</h3>
-        <p>Sistem Pengurusan Tugasan & Projek</p>
-      </div>
-    </div>
-
-    <!-- Kad Borang Login -->
-    <div class="form-section">
-      <h2 class="brand-title">Log Masuk</h2>
-      <p class="brand-subtitle">Masukkan emel dan kata laluan anda untuk meneruskan.</p>
-
-      <form id="loginForm">
-        <div class="form-group">
-          <label for="email">Emel</label>
-          <input type="email" id="email" required placeholder="nama@email.com" autocomplete="email">
-        </div>
-
-        <div class="form-group">
-          <label for="password">Kata Laluan</label>
-          <input type="password" id="password" required placeholder="••••••••" autocomplete="current-password">
-        </div>
-
-        <button type="submit" id="btnLogin" class="btn-submit">Log Masuk</button>
-      </form>
-    </div>
+  <div class="card">
+    <h2>Log Masuk nspace</h2>
+    <form id="loginForm">
+      <label>Emel</label>
+      <input type="email" id="email" required>
+      <label>Kata Laluan</label>
+      <input type="password" id="password" required>
+      <button type="submit" id="btnLogin">Log Masuk</button>
+    </form>
   </div>
 
   <script>
-    // Konfigurasi Supabase Anda
     const SUPABASE_URL = 'https://xufwnjjnuqtkfaelxqta.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_1Jm-VKyNa1CTPDbYIeDOwA_mI7zMZIc';
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // 1. Semak sesi semasa dibuka (Mesra Pelayar Telefon)
+    // Semak sesi secara senyap tanpa auto-redirect serta-merta
     window.addEventListener('DOMContentLoaded', async () => {
-      try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        if (error) throw error;
-        
-        if (session) {
-          window.location.assign('dashboard.html');
-        }
-      } catch (err) {
-        console.error("Gagal semak sesi:", err.message);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        window.location.href = 'dashboard.html';
       }
     });
 
-    // 2. Proses Log Masuk
+    // Proses Log Masuk
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-
-      const email = document.getElementById('email').value.trim();
+      const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
-      const btn = document.getElementById('btnLogin');
 
-      btn.textContent = "Sedang Log Masuk...";
-      btn.disabled = true;
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
-      try {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: email,
-          password: password
-        });
-
-        if (error) {
-          alert('Gagal Log Masuk: ' + error.message);
-          btn.textContent = "Log Masuk";
-          btn.disabled = false;
-        } else if (data.session) {
-          // Guna .assign() supaya lancar di Safari & Chrome Mobile
-          window.location.assign('dashboard.html');
-        }
-      } catch (err) {
-        alert('Ralat Sistem: ' + err.message);
-        btn.textContent = "Log Masuk";
-        btn.disabled = false;
+      if (error) {
+        alert('Gagal Log Masuk: ' + error.message);
+      } else {
+        window.location.href = 'dashboard.html';
       }
     });
   </script>
-
 </body>
 </html>
