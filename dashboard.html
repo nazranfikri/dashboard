@@ -25,20 +25,34 @@
     background-image: radial-gradient(circle, var(--line) 1px, transparent 1px);
     background-size: 22px 22px; background-attachment: fixed;
   }
-  h1,h2,h3{ font-family:'Fraunces',serif; font-weight:500; margin:0; letter-spacing:-0.01em; }
-  a{color:var(--sage-dark);} button{font-family:inherit;cursor:pointer;}
-  input,textarea{font-family:inherit;} ::selection{background:var(--sage-tint);}
-  *:focus-visible{outline:2px solid var(--sage); outline-offset:2px;}
+  
+  .app{ display:flex; min-height:100vh; max-width:1280px; margin:0 auto; transition: all 0.3s ease; display: none !important; }
+  
+  /* Sidebar Collapse Styling */
+  .sidebar{ 
+    width:260px; flex-shrink:0; padding:24px 16px; display:flex; flex-direction:column; 
+    position:sticky; top:0; height:100vh; transition: width 0.3s ease, padding 0.3s ease;
+    border-right: 1px solid var(--line); background: var(--bg);
+  }
+  .app.collapsed .sidebar { width: 70px; padding: 24px 8px; }
+  .app.collapsed .sidebar .brand h1, 
+  .app.collapsed .sidebar .brand p,
+  .app.collapsed .sidebar .user-email,
+  .app.collapsed .sidebar .nav-text,
+  .app.collapsed .sidebar .btn-text { display: none; }
+  .app.collapsed .sidebar .brand-mark { margin-bottom: 0; }
+  .app.collapsed .sidebar .user-profile-badge { text-align: center; padding: 8px 4px; }
 
-  .app{ display:flex; min-height:100vh; max-width:1180px; margin:0 auto; }
-  .sidebar{ width:240px; flex-shrink:0; padding:32px 20px; display:flex; flex-direction:column; position:sticky; top:0; height:100vh; }
-  .brand{ padding:0 8px 20px 8px; }
+  .sidebar-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .toggle-btn { background: none; border: none; cursor: pointer; color: var(--ink); padding: 6px; border-radius: var(--radius-sm); }
+  .toggle-btn:hover { background: var(--line); }
+
   .brand-mark{
     width:34px;height:34px; border-radius:99px; background:var(--sage); color:#fff;
-    display:flex;align-items:center;justify-content:center; font-family:'Fraunces',serif; font-size:17px; margin-bottom:12px;
+    display:flex;align-items:center;justify-content:center; font-family:'Fraunces',serif; font-size:17px;
   }
-  .brand h1{font-size:19px; color:var(--ink); line-height:1.25;}
-  .brand p{margin:4px 0 0; font-size:12.5px; color:var(--ink-faint);}
+  .brand h1{font-family:'Fraunces',serif; font-size:18px; color:var(--ink); margin:0;}
+  .brand p{margin:2px 0 0; font-size:11.5px; color:var(--ink-faint);}
 
   .user-profile-badge {
     background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-sm);
@@ -46,116 +60,101 @@
   }
   .user-email { font-weight: 600; color: var(--ink); word-break: break-all; margin-bottom: 4px; }
 
-  nav{display:flex; flex-direction:column; gap:2px; flex:1;}
+  nav{display:flex; flex-direction:column; gap:4px; flex:1;}
   .nav-item{
-    display:flex; align-items:center; gap:11px; padding:10px 12px;
+    display:flex; align-items:center; gap:12px; padding:10px 12px;
     border:none; background:none; border-radius:var(--radius-sm); color:var(--ink-muted);
-    font-size:14px; font-weight:500; text-align:left; border-left:2px solid transparent;
+    font-size:14px; font-weight:500; text-align:left; cursor:pointer;
   }
-  .nav-item svg{width:17px;height:17px; flex-shrink:0; opacity:0.85;}
+  .nav-item svg{width:18px;height:18px; flex-shrink:0;}
   .nav-item:hover{background:rgba(63,108,81,0.07); color:var(--ink);}
-  .nav-item.active{ background:var(--sage-tint); color:var(--sage-dark); border-left:2px solid var(--sage); }
+  .nav-item.active{ background:var(--sage-tint); color:var(--sage-dark); font-weight:600; }
 
   .sidebar-footer{ display:flex; flex-direction:column; gap:6px; padding-top:16px; margin-top:auto; border-top:1px solid var(--line); }
   .ghost-btn{
     display:flex; align-items:center; gap:9px; border:none; background:none;
-    padding:8px 12px; border-radius:var(--radius-sm); font-size:12.5px; color:var(--ink-faint);
+    padding:8px 12px; border-radius:var(--radius-sm); font-size:12.5px; color:var(--ink-faint); cursor:pointer;
   }
-  .ghost-btn svg{width:14px;height:14px;}
   .ghost-btn:hover{background:rgba(36,42,36,0.04); color:var(--ink-muted);}
 
-  main{ flex:1; padding:44px 48px 60px; min-width:0; }
+  main{ flex:1; padding:36px 40px; min-width:0; }
   .view{display:none;}
-  .view.active{display:block; animation:fade 0.25s ease;}
-  @keyframes fade{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);}}
+  .view.active{display:block;}
 
-  .view-header{margin-bottom:28px;}
-  .view-header h2{font-size:26px; color:var(--ink);}
-  .view-header p{margin:6px 0 0; font-size:14px; color:var(--ink-muted);}
+  .view-header{margin-bottom:24px;}
+  .view-header h2{font-family:'Fraunces',serif; font-size:26px; color:var(--ink); margin:0;}
+  .view-header p{margin:4px 0 0; font-size:13.5px; color:var(--ink-muted);}
   .card{ background:var(--paper); border:1px solid var(--line); border-radius:var(--radius-lg); box-shadow:var(--shadow); }
 
-  label{ display:block; font-size:12.5px; font-weight:600; color:var(--ink-muted); margin-bottom:6px; }
-  input[type=text],input[type=email],input[type=password],input[type=tel],textarea{
-    width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:var(--radius-sm);
-    background:#FEFDFB; font-size:14px; color:var(--ink);
+  /* Form & Fields */
+  label{ display:block; font-size:12px; font-weight:600; color:var(--ink-muted); margin-bottom:6px; }
+  input, select, textarea{
+    width:100%; padding:9px 12px; border:1px solid var(--line); border-radius:var(--radius-sm);
+    background:#FEFDFB; font-size:13.5px; color:var(--ink); font-family:inherit;
   }
-  input:focus,textarea:focus{border-color:var(--sage); outline:none; box-shadow:0 0 0 3px var(--sage-tint);}
-  textarea{resize:vertical; min-height:64px; line-height:1.5;}
+  input:focus, select:focus, textarea:focus{border-color:var(--sage); outline:none; box-shadow:0 0 0 3px var(--sage-tint);}
+  .form-row { display: flex; gap: 12px; margin-bottom: 12px; }
+  .form-col { flex: 1; }
 
   .btn{
-    display:inline-flex; align-items:center; gap:8px; padding:10px 18px; border-radius:var(--radius-sm);
-    font-size:13.5px; font-weight:600; border:1px solid var(--line); background:var(--paper); color:var(--ink);
+    display:inline-flex; align-items:center; gap:8px; padding:9px 16px; border-radius:var(--radius-sm);
+    font-size:13px; font-weight:600; border:1px solid var(--line); background:var(--paper); color:var(--ink); cursor:pointer;
   }
-  .btn svg{width:15px;height:15px;}
-  .btn:hover{border-color:var(--ink-faint);}
   .btn-primary{background:var(--sage); border-color:var(--sage); color:#fff;}
-  .btn-primary:hover{background:var(--sage-dark); border-color:var(--sage-dark);}
+  .btn-primary:hover{background:var(--sage-dark);}
 
-  .icon-btn{ border:none; background:none; color:var(--ink-faint); padding:6px; border-radius:var(--radius-sm); flex-shrink:0; }
-  .icon-btn svg{width:16px;height:16px; display:block;}
-  .icon-btn:hover{color:var(--danger); background:rgba(179,80,63,0.08);}
-
-  .empty-state{ text-align:center; padding:48px 20px; color:var(--ink-faint); }
-  .empty-state svg{width:34px;height:34px; margin-bottom:10px; opacity:0.6;}
-  .empty-state p{margin:0; font-size:13.5px;}
-
-  .add-form{padding:22px; margin-bottom:26px;}
-  .field-row{margin-bottom:14px;}
-  .field-row:last-child{margin-bottom:0;}
-
-  .progress-wrap{ display:flex; align-items:center; gap:16px; padding:16px 22px; margin-bottom:22px; }
-  .progress-track{ flex:1; height:7px; background:var(--sage-tint); border-radius:99px; overflow:hidden; }
-  .progress-fill{height:100%; background:var(--sage); border-radius:99px; transition:width 0.3s ease;}
-  .progress-label{font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--sage-dark); white-space:nowrap;}
-
-  .task-list{display:flex; flex-direction:column; gap:10px;}
-  .task-item{ display:flex; align-items:flex-start; gap:13px; padding:15px 18px; }
-  .task-check{ width:19px;height:19px; margin-top:2px; flex-shrink:0; accent-color:var(--sage); cursor:pointer; }
-  .task-body{flex:1; min-width:0;}
-  .task-title{font-size:14.5px; font-weight:500; margin:0;}
-  .task-remark{font-size:13px; color:var(--ink-muted); margin:4px 0 0; line-height:1.5;}
-  .task-item.done .task-title{color:var(--ink-faint); text-decoration:line-through;}
-  .task-item.done .task-remark{color:var(--ink-faint);}
-
-  .contact-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px; }
-  .contact-card{padding:18px; position:relative;}
-  .contact-top{display:flex; gap:11px; align-items:flex-start; margin-bottom:12px; padding-right:22px;}
-  .avatar{
-    width:38px;height:38px; border-radius:10px; flex-shrink:0; background:var(--gold-tint); color:var(--gold);
-    display:flex; align-items:center; justify-content:center; font-weight:600; font-size:13.5px; font-family:'Fraunces',serif;
+  /* Task Filters & Badges */
+  .filter-bar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+  .filter-chip { 
+    padding: 6px 14px; border-radius: 99px; border: 1px solid var(--line); 
+    background: var(--paper); font-size: 12.5px; cursor: pointer; color: var(--ink-muted);
   }
-  .contact-name{font-size:14.5px; font-weight:600; margin:0;}
-  .contact-role{font-size:12.5px; color:var(--ink-muted); margin:2px 0 0;}
-  .contact-remove{position:absolute; top:14px; right:14px;}
-  .contact-detail{ display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--ink-muted); padding:5px 0; }
-  .contact-detail svg{width:14px;height:14px; flex-shrink:0; color:var(--ink-faint);}
+  .filter-chip.active { background: var(--sage); color: #fff; border-color: var(--sage); }
 
-  .resume-card{padding:34px;}
-  .resume-head{ display:grid; grid-template-columns:1.3fr 1fr; gap:20px 28px; padding-bottom:22px; margin-bottom:22px; border-bottom:1px solid var(--line); }
-  .resume-name-input{font-family:'Fraunces',serif; font-size:22px !important; font-weight:500; padding:6px 8px !important; border:1px solid transparent !important; background:none !important;}
-  .resume-title-input{font-size:14.5px !important; color:var(--sage-dark); padding:4px 8px !important; border:1px solid transparent !important; background:none !important; font-weight:500;}
-  .contact-mini-grid{display:flex; flex-direction:column; gap:8px; justify-content:center;}
-  .resume-section{margin-bottom:26px;}
-  .resume-section-title{ font-size:11.5px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--sage-dark); margin-bottom:12px; display:flex; align-items:center; gap:8px; }
-  .resume-section-title::after{content:''; flex:1; height:1px; background:var(--line);}
-  .skills-wrap{display:flex; flex-wrap:wrap; gap:8px;}
-  .skill-tag{ background:var(--sage-tint); color:var(--sage-dark); font-size:12.5px; font-weight:500; padding:5px 12px; border-radius:99px; }
-  .entry-card{ border:1px solid var(--line); border-radius:var(--radius-md); padding:16px 18px; margin-bottom:12px; position:relative; }
-  .entry-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;}
-  .entry-remove{position:absolute; top:12px; right:12px;}
+  .badge { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; display: inline-block; }
+  .badge-p-high { background: #FDE8E8; color: #9B1C1C; }
+  .badge-p-medium { background: #FEF08A; color: #713F12; }
+  .badge-p-low { background: #E1EFFE; color: #1E429F; }
+  .badge-cat { background: var(--sage-tint); color: var(--sage-dark); }
+
+  /* Task List Item */
+  .add-form{padding:20px; margin-bottom:20px;}
+  .task-list{display:flex; flex-direction:column; gap:8px;}
+  .task-item{ display:flex; align-items:flex-start; gap:12px; padding:14px 16px; }
+  .task-check{ width:18px; height:18px; margin-top:2px; accent-color:var(--sage); cursor:pointer; }
+  .task-body{flex:1; min-width:0;}
+  .task-header-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap; }
+  .task-title{font-size:14px; font-weight:600; margin:0;}
+  .task-remark{font-size:12.5px; color:var(--ink-muted); margin:0; line-height:1.4;}
+  .task-item.done .task-title, .task-item.done .task-remark { color:var(--ink-faint); text-decoration:line-through; }
+  .task-actions { display: flex; gap: 4px; }
+  
+  .icon-btn{ border:none; background:none; color:var(--ink-faint); padding:4px 6px; border-radius:var(--radius-sm); cursor:pointer; font-size: 12px; }
+  .icon-btn:hover{color:var(--ink); background:var(--line);}
+
+  /* Modal Edit */
+  .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; z-index: 100; }
+  .modal.active { display: flex; }
+  .modal-content { background: var(--paper); padding: 24px; border-radius: var(--radius-md); width: 100%; max-width: 450px; }
 </style>
 </head>
 <body>
 
 <div class="app">
   <aside class="sidebar">
-    <div class="brand">
-      <div class="brand-mark">P</div>
-      <h1>Dashboard Peribadi</h1>
-      <p>Ruang kerja peribadi anda</p>
+    <div class="sidebar-header">
+      <div class="brand">
+        <div class="brand-mark">N</div>
+        <div style="margin-top: 8px;">
+          <h1>nspace</h1>
+          <p>Personal Workspace</p>
+        </div>
+      </div>
+      <button class="toggle-btn" id="toggleSidebar" title="Collapse Sidebar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
     </div>
 
-    <!-- Profil Pengguna + Log Keluar -->
     <div class="user-profile-badge">
       <div class="user-email" id="userEmailDisplay">...</div>
       <a href="#" id="btnLogout" style="color:var(--danger); font-size:11px; text-decoration:none; font-weight:600;">Log Keluar</a>
@@ -163,261 +162,364 @@
 
     <nav>
       <button class="nav-item active" data-view="todo">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 11l2 2 4-4"/><rect x="3" y="4" width="18" height="16" rx="3"/></svg>
-        Senarai Tugasan
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l2 2 4-4"/><rect x="3" y="4" width="18" height="16" rx="2"/></svg>
+        <span class="nav-text">Tugasan</span>
       </button>
       <button class="nav-item" data-view="contacts">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 19c0-3.3 2.9-5.5 6.5-5.5s6.5 2.2 6.5 5.5"/></svg>
-        Kenalan
-      </button>
-      <button class="nav-item" data-view="portfolio">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="7" width="19" height="13" rx="2.5"/><path d="M8 7V5.5A2.5 2.5 0 0 1 10.5 3h3A2.5 2.5 0 0 1 16 5.5V7"/></svg>
-        Portfolio
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>
+        <span class="nav-text">Kenalan</span>
       </button>
     </nav>
 
     <div class="sidebar-footer">
-      <button class="ghost-btn" id="exportBtn">Eksport data</button>
-      <button class="ghost-btn" id="importBtn">Import data</button>
+      <button class="ghost-btn" id="exportBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <span class="btn-text">Eksport Backup JSON</span>
+      </button>
+      <button class="ghost-btn" id="importBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span class="btn-text">Import JSON</span>
+      </button>
       <input type="file" id="importFile" accept="application/json" style="display:none;">
     </div>
   </aside>
 
   <main>
-    <!-- TO-DO -->
+    <!-- TODO VIEW -->
     <section class="view active" id="view-todo">
-      <div class="view-header"><h2>Senarai Tugasan</h2><p>Susun kerja anda dan jejaki kemajuan.</p></div>
+      <div class="view-header">
+        <h2>Senarai Tugasan</h2>
+        <p>Urus tugas harian, keutamaan dan kategori.</p>
+      </div>
+
+      <!-- Form Tambah -->
       <div class="card add-form">
-        <div class="field-row"><label for="taskTitle">Tugasan</label><input type="text" id="taskTitle" placeholder="Apa yang perlu dilakukan?"></div>
-        <div class="field-row"><label for="taskRemark">Catatan</label><textarea id="taskRemark" placeholder="Nota tambahan..."></textarea></div>
-        <div class="field-row"><button class="btn btn-primary" id="addTaskBtn">Tambah tugasan</button></div>
+        <div class="form-row">
+          <div class="form-col" style="flex:2;">
+            <label>Tugasan</label>
+            <input type="text" id="taskTitle" placeholder="Tajuk tugasan baharu...">
+          </div>
+          <div class="form-col">
+            <label>Kategori</label>
+            <select id="taskCategory">
+              <option value="Kerja">Kerja</option>
+              <option value="Peribadi">Peribadi</option>
+              <option value="Projek">Projek</option>
+              <option value="Kewangan">Kewangan</option>
+              <option value="Lain-lain">Lain-lain</option>
+            </select>
+          </div>
+          <div class="form-col">
+            <label>Priority</label>
+            <select id="taskPriority">
+              <option value="High">High</option>
+              <option value="Medium" selected>Medium</option>
+              <option value="Low">Low</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-col">
+            <label>Catatan / Nota</label>
+            <input type="text" id="taskRemark" placeholder="Nota tambahan (opsional)...">
+          </div>
+        </div>
+        <button class="btn btn-primary" id="addTaskBtn">Tambah Tugasan</button>
       </div>
-      <div class="card progress-wrap" id="progressWrap" style="display:none;">
-        <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%;"></div></div>
-        <span class="progress-label" id="progressLabel">0/0 selesai</span>
+
+      <!-- Filter Bar -->
+      <div class="filter-bar">
+        <span style="font-size:12px; font-weight:600; color:var(--ink-muted); margin-right:4px;">Tapis:</span>
+        <button class="filter-chip active" data-filter="All">Semua</button>
+        <button class="filter-chip" data-filter="Kerja">Kerja</button>
+        <button class="filter-chip" data-filter="Peribadi">Peribadi</button>
+        <button class="filter-chip" data-filter="Projek">Projek</button>
+        <button class="filter-chip" data-filter="Kewangan">Kewangan</button>
       </div>
-      <div class="task-list card" id="taskList" style="padding:8px;"></div>
-      <div class="empty-state card" id="taskEmpty"><p>Tiada tugasan lagi.</p></div>
+
+      <!-- List -->
+      <div class="task-list card" id="taskList" style="padding:10px;"></div>
     </section>
 
-    <!-- CONTACTS -->
+    <!-- CONTACTS VIEW -->
     <section class="view" id="view-contacts">
-      <div class="view-header"><h2>Kenalan</h2><p>Simpan maklumat orang penting.</p></div>
+      <div class="view-header"><h2>Kenalan</h2><p>Simpan senarai kenalan anda.</p></div>
       <div class="card add-form">
-        <div class="entry-grid">
-          <div class="field-row"><label>Nama</label><input type="text" id="cName"></div>
-          <div class="field-row"><label>Emel</label><input type="email" id="cEmail"></div>
-          <div class="field-row"><label>Telefon</label><input type="tel" id="cPhone"></div>
-          <div class="field-row"><label>Syarikat</label><input type="text" id="cCompany"></div>
+        <div class="form-row">
+          <div class="form-col"><label>Nama</label><input type="text" id="cName"></div>
+          <div class="form-col"><label>Emel</label><input type="email" id="cEmail"></div>
         </div>
-        <div class="field-row"><label>Jawatan</label><input type="text" id="cRole"></div>
-        <div class="field-row"><button class="btn btn-primary" id="addContactBtn">Tambah kenalan</button></div>
+        <button class="btn btn-primary" id="addContactBtn">Tambah Kenalan</button>
       </div>
-      <div class="contact-grid" id="contactGrid"></div>
-      <div class="empty-state card" id="contactEmpty"><p>Tiada kenalan lagi.</p></div>
-    </section>
-
-    <!-- PORTFOLIO -->
-    <section class="view" id="view-portfolio">
-      <div class="view-header"><h2>Portfolio</h2><p>Profil ringkas diri anda.</p></div>
-      <div class="card resume-card">
-        <div class="resume-head">
-          <div>
-            <input type="text" class="resume-name-input" id="pName" placeholder="Nama penuh">
-            <input type="text" class="resume-title-input" id="pTitle" placeholder="Jawatan">
-          </div>
-          <div class="contact-mini-grid">
-            <input type="email" id="pEmail" placeholder="Emel">
-            <input type="tel" id="pPhone" placeholder="Telefon">
-          </div>
-        </div>
-        <div class="resume-section">
-          <div class="resume-section-title">Ringkasan diri</div>
-          <textarea id="pSummary" placeholder="Ringkasan..."></textarea>
-        </div>
-        <div class="resume-section">
-          <div class="resume-section-title">Kemahiran</div>
-          <input type="text" id="pSkills" placeholder="Kemahiran dipisahkan koma">
-          <div class="skills-wrap" id="skillsPreview" style="margin-top:12px;"></div>
-        </div>
-        <div class="resume-section">
-          <div class="resume-section-title">Pengalaman Kerja</div>
-          <div id="experienceList"></div>
-          <button class="btn" id="addExpBtn" style="margin-top:10px;">+ Tambah Pengalaman</button>
-        </div>
-        <div class="resume-section">
-          <div class="resume-section-title">Pendidikan</div>
-          <div id="educationList"></div>
-          <button class="btn" id="addEduBtn" style="margin-top:10px;">+ Tambah Pendidikan</button>
-        </div>
-      </div>
+      <div id="contactGrid" class="task-list card" style="padding:10px;"></div>
     </section>
   </main>
+</div>
+
+<!-- MODAL EDIT TASK -->
+<div class="modal" id="editModal">
+  <div class="modal-content">
+    <h3 style="margin-top:0; font-family:'Fraunces',serif;">Kemaskini Tugasan</h3>
+    <input type="hidden" id="editTaskId">
+    <div style="margin-bottom:12px;">
+      <label>Tajuk Tugasan</label>
+      <input type="text" id="editTaskTitle">
+    </div>
+    <div class="form-row">
+      <div class="form-col">
+        <label>Kategori</label>
+        <select id="editTaskCategory">
+          <option value="Kerja">Kerja</option>
+          <option value="Peribadi">Peribadi</option>
+          <option value="Projek">Projek</option>
+          <option value="Kewangan">Kewangan</option>
+          <option value="Lain-lain">Lain-lain</option>
+        </select>
+      </div>
+      <div class="form-col">
+        <label>Priority</label>
+        <select id="editTaskPriority">
+          <option value="High">High</option>
+          <option value="Medium">Medium</option>
+          <option value="Low">Low</option>
+        </select>
+      </div>
+    </div>
+    <div style="margin-bottom:16px;">
+      <label>Catatan</label>
+      <input type="text" id="editTaskRemark">
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px;">
+      <button class="btn" id="closeModalBtn">Batal</button>
+      <button class="btn btn-primary" id="saveEditBtn">Simpan Kemaskini</button>
+    </div>
+  </div>
 </div>
 
 <script>
 (function(){
   "use strict";
 
-  // TUKAR API KEYS ANDA DI SINI
-  const SUPABASE_URL = 'https://xufwnjjnuqtkfaelxqta.supabase.co';
-  const SUPABASE_ANON_KEY = 'sb_publishable_1Jm-VKyNa1CTPDbYIeDOwA_mI7zMZIc';
+  const SUPABASE_URL = 'https://XXXXXXXXXXXXXX.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsIn...';
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  var currentUser = null;
-  var state = { tasks: [], contacts: [], portfolio: { name:"", title:"", email:"", phone:"", summary:"", skills:"", experience:[], education:[] } };
-  var uid = function(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); };
+  let currentUser = null;
+  let tasksState = [];
+  let currentFilter = "All";
 
-  // --- SEMAK LOGIN (PROTECTED ROUTE) ---
-  async function guardRoute() {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      window.location.href = 'index.html'; // Tendang ke page login jika tiada session
-    } else {
-      currentUser = session.user;
-      document.getElementById("userEmailDisplay").textContent = currentUser.email;
-      loadAllData();
-    }
-  }
-
-  document.getElementById("btnLogout").addEventListener("click", async function(e){
-    e.preventDefault();
-    await supabase.auth.signOut();
-    window.location.href = 'index.html';
+  // --- 1. COLLAPSE SIDEBAR ---
+  document.getElementById("toggleSidebar").addEventListener("click", () => {
+    document.querySelector(".app").classList.toggle("collapsed");
   });
 
-  async function loadAllData() {
-    const { data: tasks } = await supabase.from('tasks').select('*').order('created_at', { ascending: true });
-    state.tasks = tasks || [];
-
-    const { data: contacts } = await supabase.from('contacts').select('*').order('created_at', { ascending: true });
-    state.contacts = contacts || [];
-
-    const { data: portfolio } = await supabase.from('portfolios').select('*').eq('user_id', currentUser.id).single();
-    if (portfolio) {
-      state.portfolio = portfolio;
-      if(!Array.isArray(state.portfolio.experience)) state.portfolio.experience = [];
-      if(!Array.isArray(state.portfolio.education)) state.portfolio.education = [];
+  // --- 2. GUARD ROUTE ---
+  async function guardRoute() {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if (error || !session) {
+      window.location.replace('index.html');
+      return;
     }
-
-    renderTasks(); renderContacts(); fillPortfolioForm();
+    currentUser = session.user;
+    document.getElementById("userEmailDisplay").textContent = currentUser.email;
+    document.querySelector(".app").style.setProperty("display", "flex", "important");
+    loadTasks();
   }
 
-  // --- NAV ---
+  document.getElementById("btnLogout").addEventListener("click", async (e) => {
+    e.preventDefault();
+    await supabase.auth.signOut();
+    window.location.replace('index.html');
+  });
+
+  // --- 3. LOAD & RENDER TASKS ---
+  async function loadTasks() {
+    const { data } = await supabase.from('tasks').select('*').order('created_at', { ascending: false });
+    tasksState = data || [];
+    renderTasks();
+  }
+
+  function renderTasks() {
+    const list = document.getElementById("taskList");
+    let filtered = tasksState;
+    if (currentFilter !== "All") {
+      filtered = tasksState.filter(t => (t.category || "Lain-lain") === currentFilter);
+    }
+
+    if (!filtered.length) {
+      list.innerHTML = `<p style="text-align:center; color:var(--ink-faint); padding:20px;">Tiada tugasan ditemui.</p>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map(t => {
+      const p = t.priority || "Medium";
+      const c = t.category || "Lain-lain";
+      return `
+        <div class="task-item ${t.completed ? 'done' : ''}">
+          <input type="checkbox" class="task-check" ${t.completed ? 'checked' : ''} data-id="${t.id}">
+          <div class="task-body">
+            <div class="task-header-row">
+              <span class="badge badge-cat">${c}</span>
+              <span class="badge badge-p-${p.toLowerCase()}">${p}</span>
+              <p class="task-title">${t.title}</p>
+            </div>
+            ${t.remark ? `<p class="task-remark">${t.remark}</p>` : ''}
+          </div>
+          <div class="task-actions">
+            <button class="icon-btn edit-btn" data-id="${t.id}">Edit</button>
+            <button class="icon-btn delete-btn" data-id="${t.id}" style="color:var(--danger);">Padam</button>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    // Attach Event Listeners
+    list.querySelectorAll(".task-check").forEach(cb => {
+      cb.addEventListener("change", async () => {
+        const id = cb.dataset.id;
+        const status = cb.checked;
+        await supabase.from('tasks').update({ completed: status }).eq('id', id);
+        const t = tasksState.find(x => x.id === id);
+        if(t) t.completed = status;
+        renderTasks();
+      });
+    });
+
+    list.querySelectorAll(".delete-btn").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const id = btn.dataset.id;
+        await supabase.from('tasks').delete().eq('id', id);
+        tasksState = tasksState.filter(x => x.id !== id);
+        renderTasks();
+      });
+    });
+
+    list.querySelectorAll(".edit-btn").forEach(btn => {
+      btn.addEventListener("click", () => openEditModal(btn.dataset.id));
+    });
+  }
+
+  // Add Task
+  document.getElementById("addTaskBtn").addEventListener("click", async () => {
+    const title = document.getElementById("taskTitle").value.trim();
+    if (!title) return;
+
+    const newTask = {
+      title,
+      category: document.getElementById("taskCategory").value,
+      priority: document.getElementById("taskPriority").value,
+      remark: document.getElementById("taskRemark").value.trim(),
+      completed: false,
+      user_id: currentUser.id
+    };
+
+    const { data } = await supabase.from('tasks').insert([newTask]).select();
+    if (data) {
+      tasksState.unshift(data[0]);
+      renderTasks();
+      document.getElementById("taskTitle").value = "";
+      document.getElementById("taskRemark").value = "";
+    }
+  });
+
+  // Filter Chips
+  document.querySelectorAll(".filter-chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+      document.querySelectorAll(".filter-chip").forEach(c => c.classList.remove("active"));
+      chip.classList.add("active");
+      currentFilter = chip.dataset.filter;
+      renderTasks();
+    });
+  });
+
+  // --- 4. EDIT TASK MODAL ---
+  const editModal = document.getElementById("editModal");
+  function openEditModal(id) {
+    const t = tasksState.find(x => x.id === id);
+    if (!t) return;
+    document.getElementById("editTaskId").value = t.id;
+    document.getElementById("editTaskTitle").value = t.title;
+    document.getElementById("editTaskCategory").value = t.category || "Lain-lain";
+    document.getElementById("editTaskPriority").value = t.priority || "Medium";
+    document.getElementById("editTaskRemark").value = t.remark || "";
+    editModal.classList.add("active");
+  }
+
+  document.getElementById("closeModalBtn").addEventListener("click", () => editModal.classList.remove("active"));
+
+  document.getElementById("saveEditBtn").addEventListener("click", async () => {
+    const id = document.getElementById("editTaskId").value;
+    const updates = {
+      title: document.getElementById("editTaskTitle").value.trim(),
+      category: document.getElementById("editTaskCategory").value,
+      priority: document.getElementById("editTaskPriority").value,
+      remark: document.getElementById("editTaskRemark").value.trim()
+    };
+
+    await supabase.from('tasks').update(updates).eq('id', id);
+    const idx = tasksState.findIndex(x => x.id === id);
+    if (idx !== -1) tasksState[idx] = { ...tasksState[idx], ...updates };
+    
+    editModal.classList.remove("active");
+    renderTasks();
+  });
+
+  // --- 5. FIX EXPORT & IMPORT DATA ---
+  document.getElementById("exportBtn").addEventListener("click", async () => {
+    const { data: tasks } = await supabase.from('tasks').select('*');
+    const { data: contacts } = await supabase.from('contacts').select('*');
+    
+    const backupData = {
+      exported_at: new Date().toISOString(),
+      user_email: currentUser.email,
+      tasks: tasks || [],
+      contacts: contacts || []
+    };
+
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", `nspace_backup_${Date.now()}.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+  });
+
+  document.getElementById("importBtn").addEventListener("click", () => {
+    document.getElementById("importFile").click();
+  });
+
+  document.getElementById("importFile").addEventListener("change", (e) => {
+    const fileReader = new FileReader();
+    fileReader.onload = async (event) => {
+      try {
+        const importedJson = JSON.parse(event.target.result);
+        if (importedJson.tasks && Array.isArray(importedJson.tasks)) {
+          const tasksToInsert = importedJson.tasks.map(t => {
+            delete t.id; // buang ID lama supaya Supabase jana UUID baharu
+            t.user_id = currentUser.id;
+            return t;
+          });
+          await supabase.from('tasks').insert(tasksToInsert);
+        }
+        alert("Import data berjaya!");
+        loadTasks();
+      } catch (err) {
+        alert("Fail JSON tidak sah!");
+      }
+    };
+    if (e.target.files[0]) fileReader.readAsText(e.target.files[0]);
+  });
+
+  // Views Navigation
   document.querySelectorAll(".nav-item").forEach(btn => {
     btn.addEventListener("click", () => {
       document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active"));
       document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
       btn.classList.add("active");
-      document.getElementById("view-"+btn.dataset.view).classList.add("active");
+      document.getElementById("view-" + btn.dataset.view).classList.add("active");
     });
   });
-
-  // --- TASKS ---
-  function renderTasks(){
-    var list = document.getElementById("taskList"), empty = document.getElementById("taskEmpty"), prog = document.getElementById("progressWrap");
-    if(!state.tasks.length){ list.style.display="none"; empty.style.display="block"; prog.style.display="none"; return; }
-    list.style.display="flex"; empty.style.display="none"; prog.style.display="flex";
-
-    var done = state.tasks.filter(t=>t.completed).length;
-    document.getElementById("progressFill").style.width = Math.round((done/state.tasks.length)*100)+"%";
-    document.getElementById("progressLabel").textContent = done+"/"+state.tasks.length+" selesai";
-
-    list.innerHTML = state.tasks.map(t => `
-      <div class="task-item ${t.completed?'done':''}">
-        <input type="checkbox" class="task-check" ${t.completed?'checked':''} data-id="${t.id}">
-        <div class="task-body"><p class="task-title">${t.title}</p><p class="task-remark">${t.remark||''}</p></div>
-        <button class="icon-btn task-remove" data-id="${t.id}">Padam</button>
-      </div>
-    `).join("");
-
-    list.querySelectorAll(".task-check").forEach(cb => {
-      cb.addEventListener("change", async () => {
-        var t = state.tasks.find(x => x.id === cb.dataset.id);
-        if(t){ t.completed = cb.checked; renderTasks(); await supabase.from('tasks').update({ completed: cb.checked }).eq('id', t.id); }
-      });
-    });
-    list.querySelectorAll(".task-remove").forEach(btn => {
-      btn.addEventListener("click", async () => {
-        state.tasks = state.tasks.filter(x => x.id !== btn.dataset.id);
-        renderTasks(); await supabase.from('tasks').delete().eq('id', btn.dataset.id);
-      });
-    });
-  }
-
-  document.getElementById("addTaskBtn").addEventListener("click", async () => {
-    var title = document.getElementById("taskTitle").value.trim();
-    if(!title) return;
-    var newTask = { title: title, remark: document.getElementById("taskRemark").value.trim(), completed: false, user_id: currentUser.id };
-    const { data } = await supabase.from('tasks').insert([newTask]).select();
-    if(data) state.tasks.push(data[0]);
-    document.getElementById("taskTitle").value = ""; document.getElementById("taskRemark").value = "";
-    renderTasks();
-  });
-
-  // --- CONTACTS ---
-  function renderContacts(){
-    var grid = document.getElementById("contactGrid"), empty = document.getElementById("contactEmpty");
-    if(!state.contacts.length){ grid.style.display="none"; empty.style.display="block"; return; }
-    grid.style.display="grid"; empty.style.display="none";
-
-    grid.innerHTML = state.contacts.map(c => `
-      <div class="card contact-card">
-        <button class="icon-btn contact-remove" data-id="${c.id}" style="position:absolute;top:10px;right:10px;">X</button>
-        <p class="contact-name">${c.name}</p>
-        <p class="contact-role">${c.role||''} ${c.company?'di '+c.company:''}</p>
-        <p style="font-size:12px;color:var(--ink-muted);">${c.email||''} | ${c.phone||''}</p>
-      </div>
-    `).join("");
-
-    grid.querySelectorAll(".contact-remove").forEach(btn => {
-      btn.addEventListener("click", async () => {
-        state.contacts = state.contacts.filter(x => x.id !== btn.dataset.id);
-        renderContacts(); await supabase.from('contacts').delete().eq('id', btn.dataset.id);
-      });
-    });
-  }
-
-  document.getElementById("addContactBtn").addEventListener("click", async () => {
-    var name = document.getElementById("cName").value.trim();
-    if(!name) return;
-    var newC = { name: name, email: document.getElementById("cEmail").value, phone: document.getElementById("cPhone").value, company: document.getElementById("cCompany").value, role: document.getElementById("cRole").value, user_id: currentUser.id };
-    const { data } = await supabase.from('contacts').insert([newC]).select();
-    if(data) state.contacts.push(data[0]);
-    renderContacts();
-  });
-
-  // --- PORTFOLIO ---
-  var pFields = ["pName","pTitle","pEmail","pPhone","pSummary","pSkills"];
-  var pMap = {pName:"name",pTitle:"title",pEmail:"email",pPhone:"phone",pSummary:"summary",pSkills:"skills"};
-  pFields.forEach(id => {
-    document.getElementById(id).addEventListener("input", (e) => {
-      state.portfolio[pMap[id]] = e.target.value;
-      if(id==="pSkills") renderSkills();
-      savePortfolioDebounced();
-    });
-  });
-
-  let saveTimeout;
-  function savePortfolioDebounced() {
-    clearTimeout(saveTimeout);
-    saveTimeout = setTimeout(async () => {
-      await supabase.from('portfolios').upsert({
-        user_id: currentUser.id, name: state.portfolio.name, title: state.portfolio.title,
-        email: state.portfolio.email, phone: state.portfolio.phone, summary: state.portfolio.summary,
-        skills: state.portfolio.skills, experience: state.portfolio.experience, education: state.portfolio.education
-      });
-    }, 1000);
-  }
-
-  function renderSkills(){
-    document.getElementById("skillsPreview").innerHTML = (state.portfolio.skills||"").split(",").filter(Boolean).map(s => `<span class="skill-tag">${s.trim()}</span>`).join("");
-  }
-
-  function fillPortfolioForm(){
-    pFields.forEach(id => { document.getElementById(id).value = state.portfolio[pMap[id]] || ""; });
-    renderSkills();
-  }
 
   guardRoute();
 })();
