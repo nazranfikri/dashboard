@@ -55,46 +55,52 @@
     </form>
   </div>
 
-  <script>
-    const SUPABASE_URL = 'https://xufwnjjnuqtkfaelxqta.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_1Jm-VKyNa1CTPDbYIeDOwA_mI7zMZIc';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const SUPABASE_URL = 'https://XXXXXXXXXXXXXX.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsIn...';
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // 1. SEMAK SESI Sedia Ada (Guna getUser untuk elak loop)
-    async function checkExistingSession() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        // Jika user dah memang login, terus bawa ke dashboard
-        window.location.replace('dashboard.html');
-      }
-    }
-    checkExistingSession();
-
-    // 2. PROSES LOG MASUK
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
+  // Semak sesi sedia ada semasa halaman dibuka
+  window.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) throw error;
       
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      const btn = document.getElementById('btnLogin');
+      if (session) {
+        window.location.assign('dashboard.html');
+      }
+    } catch (err) {
+      console.error("Session check error:", err.message);
+    }
+  });
 
-      btn.textContent = "Sedang Log Masuk...";
-      btn.disabled = true;
+  // Proses Log Masuk
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const btn = document.getElementById('btnLogin');
 
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: password
+    btn.textContent = "Sedang Log Masuk...";
+    btn.disabled = true;
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({ 
+        email: email, 
+        password: password 
       });
 
       if (error) {
         alert('Gagal Log Masuk: ' + error.message);
         btn.textContent = "Log Masuk";
         btn.disabled = false;
-      } else {
-        // Log masuk berjaya -> pergi ke dashboard
-        window.location.replace('dashboard.html');
+      } else if (data.session) {
+        // Guna window.location.assign untuk keserasian pelayar telefon yang lebih baik
+        window.location.assign('dashboard.html');
       }
-    });
-  </script>
-</body>
-</html>
+    } catch (err) {
+      alert('Ralat Sistem: ' + err.message);
+      btn.textContent = "Log Masuk";
+      btn.disabled = false;
+    }
+  });
