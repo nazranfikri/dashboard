@@ -177,33 +177,34 @@
       </div>
     </div>
 
-    <!-- Kad Borang Login -->
+    <!-- Kad Borang Login (Tanpa Tag <form> Untuk Elak Reload) -->
     <div class="form-section">
       <h2 class="brand-title">Log Masuk</h2>
       <p class="brand-subtitle">Masukkan emel dan kata laluan anda untuk meneruskan.</p>
 
-      <form id="loginForm">
+      <div class="login-container">
         <div class="form-group">
           <label for="email">Emel</label>
-          <input type="email" id="email" required placeholder="nama@email.com" autocomplete="email">
+          <input type="email" id="email" placeholder="nama@email.com" autocomplete="email">
         </div>
 
         <div class="form-group">
           <label for="password">Kata Laluan</label>
-          <input type="password" id="password" required placeholder="••••••••" autocomplete="current-password">
+          <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
         </div>
 
-        <button type="submit" id="btnLogin" class="btn-submit">Log Masuk</button>
-      </form>
+        <button type="button" id="btnLogin" class="btn-submit">Log Masuk</button>
+      </div>
     </div>
   </div>
 
   <script>
     const SUPABASE_URL = 'https://xufwnjjnuqtkfaelxqta.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh1ZnduampudXF0a2ZhZWx4cXRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg5Mzc3NDcsImV4cCI6MjEwNDUxMzc0N30.6PoQb6jAuPIHbdn4TbVWcvAiBLDHvULiUafdFdIfYwg'; 
+    // Sila pastikan kekunci anon di bawah adalah tepat dari Supabase Dashboard
+    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY_HERE'; 
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Semak sesi sedia ada
+    // Semak sesi sedia ada semasa dimuatkan
     window.addEventListener('DOMContentLoaded', async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
@@ -217,13 +218,16 @@
       }
     });
 
-    // Proses Log Masuk Standard
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-
+    // Fungsi Log Masuk Direct
+    async function handleLogin() {
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
       const btn = document.getElementById('btnLogin');
+
+      if (!email || !password) {
+        alert('Sila masukkan emel dan kata laluan.');
+        return;
+      }
 
       btn.textContent = "Sedang Log Masuk...";
       btn.disabled = true;
@@ -253,6 +257,16 @@
         alert('Ralat Sistem: ' + err.message);
         btn.textContent = "Log Masuk";
         btn.disabled = false;
+      }
+    }
+
+    // Event Listener Klik Butang
+    document.getElementById('btnLogin').addEventListener('click', handleLogin);
+
+    // Event Listener Tekan Kunci Enter
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        handleLogin();
       }
     });
   </script>
