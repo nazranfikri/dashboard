@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Peribadi - nspace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+  :root{
+    --bg:#F7F4EC; --paper:#FFFFFF; --ink:#242A24; --ink-muted:#6E7268;
+    --ink-faint:#A3A69B; --line:#E4DFCF; --sage:#3F6C51; --sage-dark:#2C4E39;
+    --sage-tint:#E7EFE6; --danger:#B3503F;
+    --radius-sm:6px; --radius-md:10px; --radius-lg:16px;
+    --shadow:0 1px 2px rgba(36,42,36,0.04), 0 4px 16px rgba(36,42,36,0.04);
+
+    /* Priority Colors */
+    --p-high-bg: #FDF2F2; --p-high-border: #B3503F; --p-high-text: #9B1C1C;
+    --p-medium-bg: #FEF8EE; --p-medium-border: #B4813C; --p-medium-text: #713F12;
+    --p-low-bg: #EBF8FF; --p-low-border: #2B6CB0; --p-low-text: #1C5980;
+    --p-done-bg: #F0FDF4; --p-done-border: #2F855A; --p-done-text: #22543D;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Inter',sans-serif; background:var(--bg); color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    background-image: radial-gradient(circle, var(--line) 1px, transparent 1px);
+    background-size: 22px 22px; background-attachment: fixed;
+  }
+  
+  .app{ display:none; min-height:100vh; max-width:1280px; margin:0 auto; transition: all 0.3s ease; }
+  
+  /* Sidebar Collapse Styling */
+  .sidebar{ 
+    width:260px; flex-shrink:0; padding:24px 16px; display:flex; flex-direction:column; 
+    position:sticky; top:0; height:100vh; transition: width 0.3s ease, padding 0.3s ease;
+    border-right: 1px solid var(--line); background: var(--bg);
+  }
+  .app.collapsed .sidebar { width: 70px; padding: 24px 8px; }
+  .app.collapsed .sidebar .brand h1, 
+  .app.collapsed .sidebar .brand p,
+  .app.collapsed .sidebar .user-email,
+  .app.collapsed .sidebar .nav-text,
+  .app.collapsed .sidebar .btn-text { display: none; }
+  .app.collapsed .sidebar .user-profile-badge { text-align: center; padding: 8px 4px; }
+
+  .sidebar-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .toggle-btn { background: none; border: none; cursor: pointer; color: var(--ink); padding: 6px; border-radius: var(--radius-sm); }
+  .toggle-btn:hover { background: var(--line); }
+
+  .brand-mark{
+    width:34px;height:34px; border-radius:99px; background:var(--sage); color:#fff;
+    display:flex;align-items:center;justify-content:center; font-family:'Fraunces',serif; font-size:17px;
+  }
+  .brand h1{font-family:'Fraunces',serif; font-size:18px; color:var(--ink); margin:0;}
+  .brand p{margin:2px 0 0; font-size:11.5px; color:var(--ink-faint);}
+
+  .user-profile-badge {
+    background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-sm);
+    padding: 10px; margin-bottom: 16px; font-size: 12px;
+  }
+  .user-email { font-weight: 600; color: var(--ink); word-break: break-all; margin-bottom: 4px; }
+
+  nav{display:flex; flex-direction:column; gap:4px; flex:1;}
+  .nav-item{
+    display:flex; align-items:center; gap:12px; padding:10px 12px;
+    border:none; background:none; border-radius:var(--radius-sm); color:var(--ink-muted);
+    font-size:13.5px; font-weight:500; text-align:left; cursor:pointer;
+  }
+  .nav-item svg{width:18px;height:18px; flex-shrink:0;}
+  .nav-item:hover{background:rgba(63,108,81,0.07); color:var(--ink);}
+  .nav-item.active{ background:var(--sage-tint); color:var(--sage-dark); font-weight:600; }
+
+  .sidebar-footer{ display:flex; flex-direction:column; gap:6px; padding-top:16px; margin-top:auto; border-top:1px solid var(--line); }
+  .ghost-btn{
+    display:flex; align-items:center; gap:9px; border:none; background:none;
+    padding:8px 12px; border-radius:var(--radius-sm); font-size:12.5px; color:var(--ink-faint); cursor:pointer;
+  }
+  .ghost-btn:hover{background:rgba(36,42,36,0.04); color:var(--ink-muted);}
+
+  main{ flex:1; padding:36px 40px; min-width:0; }
+  .view{display:none;}
+  .view.active{display:block;}
+
+  .view-header{margin-bottom:24px;}
+  .view-header h2{font-family:'Fraunces',serif; font-size:26px; color:var(--ink); margin:0;}
+  .view-header p{margin:4px 0 0; font-size:13.5px; color:var(--ink-muted);}
+  .card{ background:var(--paper); border:1px solid var(--line); border-radius:var(--radius-lg); box-shadow:var(--shadow); }
+
+  /* Forms & Inputs */
+  label{ display:block; font-size:12px; font-weight:600; color:var(--ink-muted); margin-bottom:6px; }
+  input, select, textarea{
+    width:100%; padding:9px 12px; border:1px solid var(--line); border-radius:var(--radius-sm);
+    background:#FEFDFB; font-size:13.5px; color:var(--ink); font-family:inherit;
+  }
+  input:focus, select:focus, textarea:focus{border-color:var(--sage); outline:none; box-shadow:0 0 0 3px var(--sage-tint);}
+  .form-row { display: flex; gap: 12px; margin-bottom: 12px; }
+  .form-col { flex: 1; }
+
+  .btn{
+    display:inline-flex; align-items:center; gap:8px; padding:9px 16px; border-radius:var(--radius-sm);
+    font-size:13px; font-weight:600; border:1px solid var(--line); background:var(--paper); color:var(--ink); cursor:pointer;
+  }
+  .btn-primary{background:var(--sage); border-color:var(--sage); color:#fff;}
+  .btn-primary:hover{background:var(--sage-dark);}
+
+  /* Excel Style Table & Priority Sections */
+  .priority-section { margin-bottom: 28px; }
+  .priority-title-bar { 
+    display: flex; align-items: center; justify-content: space-between; 
+    padding: 10px 16px; border-radius: var(--radius-sm); margin-bottom: 10px; font-weight: 700; font-size: 14px;
+  }
+  .priority-title-bar.high { background: var(--p-high-bg); color: var(--p-high-text); border-left: 5px solid var(--p-high-border); }
+  .priority-title-bar.medium { background: var(--p-medium-bg); color: var(--p-medium-text); border-left: 5px solid var(--p-medium-border); }
+  .priority-title-bar.low { background: var(--p-low-bg); color: var(--p-low-text); border-left: 5px solid var(--p-low-border); }
+
+  .task-table { width: 100%; border-collapse: collapse; font-size: 13.5px; background: var(--paper); border-radius: var(--radius-md); overflow: hidden; }
+  .task-table th, .task-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--line); }
+  .task-table th { background: #FAF8F5; font-size: 12px; font-weight: 600; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .task-table tr:last-child td { border-bottom: none; }
+  
+  /* Row Colors */
+  .task-row-high { border-left: 4px solid var(--p-high-border); }
+  .task-row-medium { border-left: 4px solid var(--p-medium-border); }
+  .task-row-low { border-left: 4px solid var(--p-low-border); }
+  .task-row-completed { border-left: 4px solid var(--p-done-border); background: var(--p-done-bg) !important; opacity: 0.75; }
+  .task-row-completed .task-title-text { text-decoration: line-through; color: var(--ink-faint); }
+
+  /* Badges */
+  .badge { padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; text-transform: uppercase; display: inline-block; }
+  .badge-high { background: var(--p-high-bg); color: var(--p-high-text); border: 1px solid var(--p-high-border); }
+  .badge-medium { background: var(--p-medium-bg); color: var(--p-medium-text); border: 1px solid var(--p-medium-border); }
+  .badge-low { background: var(--p-low-bg); color: var(--p-low-text); border: 1px solid var(--p-low-border); }
+  .badge-completed { background: var(--p-done-bg); color: var(--p-done-text); border: 1px solid var(--p-done-border); }
+  .badge-cat { background: var(--sage-tint); color: var(--sage-dark); font-weight: 600; }
+
+  /* Modal Edit */
+  .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; z-index: 100; }
+  .modal.active { display: flex; }
+  .modal-content { background: var(--paper); padding: 24px; border-radius: var(--radius-md); width: 100%; max-width: 450px; }
+</style>
+</head>
+<body>
+
+<div class="app" id="appContainer">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="brand">
+        <div class="brand-mark">N</div>
+        <div style="margin-top: 8px;">
+          <h1>nspace</h1>
+          <p>Personal Workspace</p>
+        </div>
+      </div>
+      <button class="toggle-btn" id="toggleSidebar" title="Collapse Sidebar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="user-profile-badge">
+      <div class="user-email" id="userEmailDisplay">Log Masuk...</div>
+      <button type="button" id="btnLogout" style="color:var(--danger); font-size:11px; border:none; background:none; cursor:pointer; font-weight:600; padding:0;">Log Keluar</button>
+    </div>
+
+    <nav>
+      <button class="nav-item active" data-view="add-task">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span class="nav-text">Tambah Tugasan</span>
+      </button>
+      <button class="nav-item" data-view="priority-board">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l2 2 4-4"/><rect x="3" y="4" width="18" height="16" rx="2"/></svg>
+        <span class="nav-text">Papan Keutamaan</span>
+      </button>
+      <button class="nav-item" data-view="contacts">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>
+        <span class="nav-text">Kenalan</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="ghost-btn" id="exportBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <span class="btn-text">Eksport Backup JSON</span>
+      </button>
+      <button class="ghost-btn" id="importBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span class="btn-text">Import JSON</span>
+      </button>
+      <input type="file" id="importFile" accept="application/json" style="display:none;">
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main>
+    <!-- PAGE 1: TAMBAH TUGASAN -->
+    <section class="view active" id="view-add-task">
+      <div class="view-header">
+        <h2>Borang Masukan Tugasan</h2>
+        <p>Tambah tugasan baharu ke dalam senarai sebelum disusulkan ke Papan Keutamaan.</p>
+      </div>
+
+      <div class="card" style="padding:24px; max-width:650px;">
+        <div class="form-row">
+          <div class="form-col" style="flex:2;">
+            <label>Tajuk Tugasan *</label>
+            <input type="text" id="taskTitle" placeholder="Contoh: Kemaskini penyata kewangan...">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-col">
+            <label>Kategori</label>
+            <select id="taskCategory">
+              <option value="Kerja">Kerja</option>
+              <option value="Peribadi">Peribadi</option>
+              <option value="Projek">Projek</option>
+              <option value="Kewangan">Kewangan</option>
+              <option value="Lain-lain">Lain-lain</option>
+            </select>
+          </div>
+          <div class="form-col">
+            <label>Tahap Keutamaan (Priority)</label>
+            <select id="taskPriority">
+              <option value="High">High (Tinggi)</option>
+              <option value="Medium" selected>Medium (Sederhana)</option>
+              <option value="Low">Low (Rendah)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row" style="margin-bottom:20px;">
+          <div class="form-col">
+            <label>Catatan / Nota Tambahan</label>
+            <textarea id="taskRemark" rows="3" placeholder="Masukkan nota atau arahan lanjut jika ada..."></textarea>
+          </div>
+        </div>
+        <button class="btn btn-primary" id="addTaskBtn" style="width:100%; justify-content:center;">Simpan Tugasan Baharu</button>
+      </div>
+    </section>
+
+    <!-- PAGE 2: PAPAN KEUTAMAAN (PRIORITY BOARD VIEW) -->
+    <section class="view" id="view-priority-board">
+      <div class="view-header" style="display:flex; justify-content:space-between; align-items:flex-end;">
+        <div>
+          <h2>Papan Keutamaan Tugasan</h2>
+          <p>Disusun mengikut tahap keutamaan (High $\rightarrow$ Medium $\rightarrow$ Low) dan berpenapis.</p>
+        </div>
+        <!-- EXCEL STYLE FILTER -->
+        <div style="width:220px;">
+          <label style="margin-bottom:4px;">Filter Kategori:</label>
+          <select id="categoryFilter" style="background:var(--paper); border-color:var(--sage);">
+            <option value="All">Semua Kategori</option>
+            <option value="Kerja">Kerja</option>
+            <option value="Peribadi">Peribadi</option>
+            <option value="Projek">Projek</option>
+            <option value="Kewangan">Kewangan</option>
+            <option value="Lain-lain">Lain-lain</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- High Priority Container -->
+      <div class="priority-section">
+        <div class="priority-title-bar high">
+          <span>HIGH PRIORITY (Tinggi)</span>
+          <span id="count-high" style="font-size:12px;">0 Tugasan</span>
+        </div>
+        <div class="card" style="overflow:hidden;">
+          <table class="task-table">
+            <thead>
+              <tr>
+                <th style="width:40px;">Status</th>
+                <th>Kategori</th>
+                <th>Tugasan / Catatan</th>
+                <th style="width:100px; text-align:right;">Tindakan</th>
+              </tr>
+            </thead>
+            <tbody id="list-high"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Medium Priority Container -->
+      <div class="priority-section">
+        <div class="priority-title-bar medium">
+          <span>MEDIUM PRIORITY (Sederhana)</span>
+          <span id="count-medium" style="font-size:12px;">0 Tugasan</span>
+        </div>
+        <div class="card" style="overflow:hidden;">
+          <table class="task-table">
+            <thead>
+              <tr>
+                <th style="width:40px;">Status</th>
+                <th>Kategori</th>
+                <th>Tugasan / Catatan</th>
+                <th style="width:100px; text-align:right;">Tindakan</th>
+              </tr>
+            </thead>
+            <tbody id="list-medium"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Low Priority Container -->
+      <div class="priority-section">
+        <div class="priority-title-bar low">
+          <span>LOW PRIORITY (Rendah)</span>
+          <span id="count-low" style="font-size:12px;">0 Tugasan</span>
+        </div>
+        <div class="card" style="overflow:hidden;">
+          <table class="task-table">
+            <thead>
+              <tr>
+                <th style="width:40px;">Status</th>
+                <th>Kategori</th>
+                <th>Tugasan / Catatan</th>
+                <th style="width:100px; text-align:right;">Tindakan</th>
+              </tr>
+            </thead>
+            <tbody id="list-low"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 3: KENALAN -->
+    <section class="view" id="view-contacts">
+      <div class="view-header"><h2>Kenalan</h2><p>Simpan senarai kenalan anda.</p></div>
+      <div class="card" style="padding:20px; margin-bottom:20px;">
+        <div class="form-row">
+          <div class="form-col"><label>Nama</label><input type="text" id="cName"></div>
+          <div class="form-col"><label>Emel</label><input type="email" id="cEmail"></div>
+        </div>
+        <button class="btn btn-primary" id="addContactBtn">Tambah Kenalan</button>
+      </div>
+      <div id="contactGrid" class="card" style="padding:20px;"></div>
+    </section>
+  </main>
+</div>
+
+<!-- MODAL EDIT TASK -->
+<div class="modal" id="editModal">
+  <div class="modal-content">
+    <h3 style="margin-top:0; font-family:'Fraunces',serif;">Kemaskini Tugasan</h3>
+    <input type="hidden" id="editTaskId">
+    <div style="margin-bottom:12px;">
+      <label>Tajuk Tugasan</label>
+      <input type="text" id="editTaskTitle">
+    </div>
+    <div class="form-row">
+      <div class="form-col">
+        <label>Kategori</label>
+        <select id="editTaskCategory">
+          <option value="Kerja">Kerja</option>
+          <option value="Peribadi">Peribadi</option>
+          <option value="Projek">Projek</option>
+          <option value="Kewangan">Kewangan</option>
+          <option value="Lain-lain">Lain-lain</option>
+        </select>
+      </div>
+      <div class="form-col">
+        <label>Priority</label>
+        <select id="editTaskPriority">
+          <option value="High">High</option>
+          <option value="Medium">Medium</option>
+          <option value="Low">Low</option>
+        </select>
+      </div>
+    </div>
+    <div style="margin-bottom:16px;">
+      <label>Catatan</label>
+      <textarea id="editTaskRemark" rows="3"></textarea>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px;">
+      <button class="btn" id="closeModalBtn">Batal</button>
+      <button class="btn btn-primary" id="saveEditBtn">Simpan Kemaskini</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  const SUPABASE_URL = 'https://xufwnjjnuqtkfaelxqta.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh1ZnduampudXF0a2ZhZWx4cXRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg5Mzc3NDcsImV4cCI6MjEwNDUxMzc0N30.6PoQb6jAuPIHbdn4TbVWcvAiBLDHvULiUafdFdIfYwg';
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  let currentUser = null;
+  let tasksState = [];
+  let selectedCategory = "All";
+
+  // --- COLLAPSE SIDEBAR ---
+  const toggleBtn = document.getElementById("toggleSidebar");
+  if(toggleBtn) {
+    toggleBtn.addEventListener("click", () => {
+      document.getElementById("appContainer").classList.toggle("collapsed");
+    });
+  }
+
+  // --- ROUTE GUARD ---
+  async function guardRoute() {
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession();
+
+      if (error || !session) {
+        window.location.replace('index.html');
+        return;
+      }
+
+      currentUser = session.user;
+      document.getElementById("userEmailDisplay").textContent = currentUser.email;
+      
+      const appEl = document.getElementById("appContainer");
+      appEl.style.display = "flex";
+      
+      loadTasks();
+    } catch(e) {
+      window.location.replace('index.html');
+    }
+  }
+
+  // --- LOGOUT FUNCTIONALITY ---
+  const btnLogout = document.getElementById("btnLogout");
+  if(btnLogout) {
+    btnLogout.addEventListener("click", async () => {
+      await supabase.auth.signOut();
+      window.location.replace('index.html');
+    });
+  }
+
+  // Listen to Auth state changes
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_OUT' || !session) {
+      window.location.replace('index.html');
+    }
+  });
+
+  // --- LOAD & RENDER TASKS ---
+  async function loadTasks() {
+    const { data } = await supabase.from('tasks').select('*').order('created_at', { ascending: false });
+    tasksState = data || [];
+    renderBoard();
+  }
+
+  function renderBoard() {
+    let filtered = tasksState;
+    if (selectedCategory !== "All") {
+      filtered = tasksState.filter(t => (t.category || "Lain-lain") === selectedCategory);
+    }
+
+    const highTasks = filtered.filter(t => (t.priority || "Medium") === "High");
+    const mediumTasks = filtered.filter(t => (t.priority || "Medium") === "Medium");
+    const lowTasks = filtered.filter(t => (t.priority || "Medium") === "Low");
+
+    renderTableRows("list-high", highTasks, "high");
+    renderTableRows("list-medium", mediumTasks, "medium");
+    renderTableRows("list-low", lowTasks, "low");
+
+    document.getElementById("count-high").textContent = `${highTasks.length} Tugasan`;
+    document.getElementById("count-medium").textContent = `${mediumTasks.length} Tugasan`;
+    document.getElementById("count-low").textContent = `${lowTasks.length} Tugasan`;
+  }
+
+  function renderTableRows(elementId, tasks, priorityLevel) {
+    const container = document.getElementById(elementId);
+    if (!container) return;
+
+    if (!tasks.length) {
+      container.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--ink-faint); padding:16px;">Tiada tugasan rekod dalam bahagian ini.</td></tr>`;
+      return;
+    }
+
+    container.innerHTML = tasks.map(t => {
+      const isDone = t.completed;
+      const rowClass = isDone ? 'task-row-completed' : `task-row-${priorityLevel}`;
+      const badgeClass = isDone ? 'badge-completed' : `badge-${priorityLevel}`;
+      const badgeText = isDone ? 'SELESAI' : priorityLevel.toUpperCase();
+
+      return `
+        <tr class="${rowClass}">
+          <td>
+            <input type="checkbox" class="task-check" ${isDone ? 'checked' : ''} data-id="${t.id}">
+          </td>
+          <td>
+            <span class="badge badge-cat">${t.category || 'Lain-lain'}</span>
+            <span class="badge ${badgeClass}" style="margin-left:4px;">${badgeText}</span>
+          </td>
+          <td>
+            <div class="task-title-text" style="font-weight:600; color:var(--ink);">${t.title}</div>
+            ${t.remark ? `<div style="font-size:12px; color:var(--ink-muted); margin-top:2px;">${t.remark}</div>` : ''}
+          </td>
+          <td style="text-align:right;">
+            <button class="btn edit-btn" data-id="${t.id}" style="padding:4px 8px; font-size:11px;">Edit</button>
+            <button class="btn delete-btn" data-id="${t.id}" style="padding:4px 8px; font-size:11px; color:var(--danger);">Padam</button>
+          </td>
+        </tr>
+      `;
+    }).join("");
+
+    // Attach Action Events
+    container.querySelectorAll(".task-check").forEach(cb => {
+      cb.addEventListener("change", async () => {
+        const id = cb.dataset.id;
+        const status = cb.checked;
+        await supabase.from('tasks').update({ completed: status }).eq('id', id);
+        const t = tasksState.find(x => x.id === id);
+        if(t) t.completed = status;
+        renderBoard();
+      });
+    });
+
+    container.querySelectorAll(".delete-btn").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const id = btn.dataset.id;
+        await supabase.from('tasks').delete().eq('id', id);
+        tasksState = tasksState.filter(x => x.id !== id);
+        renderBoard();
+      });
+    });
+
+    container.querySelectorAll(".edit-btn").forEach(btn => {
+      btn.addEventListener("click", () => openEditModal(btn.dataset.id));
+    });
+  }
+
+  // --- ADD TASK ---
+  const addTaskBtn = document.getElementById("addTaskBtn");
+  if(addTaskBtn) {
+    addTaskBtn.addEventListener("click", async () => {
+      const title = document.getElementById("taskTitle").value.trim();
+      if (!title) { alert("Sila masukkan tajuk tugasan."); return; }
+
+      const newTask = {
+        title,
+        category: document.getElementById("taskCategory").value,
+        priority: document.getElementById("taskPriority").value,
+        remark: document.getElementById("taskRemark").value.trim(),
+        completed: false,
+        user_id: currentUser.id
+      };
+
+      const { data } = await supabase.from('tasks').insert([newTask]).select();
+      if (data) {
+        tasksState.unshift(data[0]);
+        document.getElementById("taskTitle").value = "";
+        document.getElementById("taskRemark").value = "";
+        alert("Tugasan berjaya disimpan!");
+        document.querySelector('[data-view="priority-board"]').click();
+      }
+    });
+  }
+
+  // --- FILTER EXCEL DROPDOWN ---
+  const categoryFilter = document.getElementById("categoryFilter");
+  if(categoryFilter) {
+    categoryFilter.addEventListener("change", (e) => {
+      selectedCategory = e.target.value;
+      renderBoard();
+    });
+  }
+
+  // --- EDIT MODAL ---
+  const editModal = document.getElementById("editModal");
+  function openEditModal(id) {
+    const t = tasksState.find(x => x.id === id);
+    if (!t) return;
+    document.getElementById("editTaskId").value = t.id;
+    document.getElementById("editTaskTitle").value = t.title;
+    document.getElementById("editTaskCategory").value = t.category || "Lain-lain";
+    document.getElementById("editTaskPriority").value = t.priority || "Medium";
+    document.getElementById("editTaskRemark").value = t.remark || "";
+    editModal.classList.add("active");
+  }
+
+  const closeModalBtn = document.getElementById("closeModalBtn");
+  if(closeModalBtn) {
+    closeModalBtn.addEventListener("click", () => editModal.classList.remove("active"));
+  }
+
+  const saveEditBtn = document.getElementById("saveEditBtn");
+  if(saveEditBtn) {
+    saveEditBtn.addEventListener("click", async () => {
+      const id = document.getElementById("editTaskId").value;
+      const updates = {
+        title: document.getElementById("editTaskTitle").value.trim(),
+        category: document.getElementById("editTaskCategory").value,
+        priority: document.getElementById("editTaskPriority").value,
+        remark: document.getElementById("editTaskRemark").value.trim()
+      };
+
+      await supabase.from('tasks').update(updates).eq('id', id);
+      const idx = tasksState.findIndex(x => x.id === id);
+      if (idx !== -1) tasksState[idx] = { ...tasksState[idx], ...updates };
+      
+      editModal.classList.remove("active");
+      renderBoard();
+    });
+  }
+
+  // --- EXPORT & IMPORT BACKUP ---
+  const exportBtn = document.getElementById("exportBtn");
+  if(exportBtn) {
+    exportBtn.addEventListener("click", async () => {
+      const { data: tasks } = await supabase.from('tasks').select('*');
+      const backupData = { exported_at: new Date().toISOString(), user_email: currentUser.email, tasks: tasks || [] };
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+      const dlAnchor = document.createElement('a');
+      dlAnchor.setAttribute("href", dataStr);
+      dlAnchor.setAttribute("download", `nspace_backup_${Date.now()}.json`);
+      document.body.appendChild(dlAnchor);
+      dlAnchor.click();
+      dlAnchor.remove();
+    });
+  }
+
+  const importBtn = document.getElementById("importBtn");
+  const importFile = document.getElementById("importFile");
+  if(importBtn && importFile) {
+    importBtn.addEventListener("click", () => importFile.click());
+    importFile.addEventListener("change", (e) => {
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          const json = JSON.parse(event.target.result);
+          if (json.tasks && Array.isArray(json.tasks)) {
+            const tasksToInsert = json.tasks.map(t => { delete t.id; t.user_id = currentUser.id; return t; });
+            await supabase.from('tasks').insert(tasksToInsert);
+          }
+          alert("Import berjaya!");
+          loadTasks();
+        } catch (err) { alert("Fail JSON tidak sah!"); }
+      };
+      if (e.target.files[0]) reader.readAsText(e.target.files[0]);
+    });
+  }
+
+  // --- NAVIGATION SWITCHER ---
+  document.querySelectorAll(".nav-item").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById("view-" + btn.dataset.view).classList.add("active");
+    });
+  });
+
+  guardRoute();
+})();
+</script>
+</body>
+</html>
