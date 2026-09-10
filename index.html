@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log Masuk - Dashboard Peribadi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+  :root {
+    --bg: #F7F4EC; --paper: #FFFFFF; --ink: #242A24;
+    --ink-muted: #6E7268; --line: #E4DFCF; --sage: #3F6C51;
+    --sage-dark: #2C4E39; --sage-tint: #E7EFE6; --radius-md: 12px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Inter', sans-serif; background: var(--bg); color: var(--ink);
+    margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background-image: radial-gradient(circle, var(--line) 1px, transparent 1px); background-size: 22px 22px;
+  }
+  .login-card {
+    background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-md);
+    padding: 32px; width: 100%; max-width: 380px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  }
+  .brand-mark {
+    width: 40px; height: 40px; border-radius: 10px; background: var(--sage); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif;
+    font-size: 20px; margin-bottom: 16px;
+  }
+  h1 { font-family: 'Fraunces', serif; font-size: 22px; margin: 0 0 6px; }
+  p { font-size: 13.5px; color: var(--ink-muted); margin: 0 0 24px; }
+  label { display: block; font-size: 12px; font-weight: 600; color: var(--ink-muted); margin-bottom: 6px; }
+  input {
+    width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px;
+    font-size: 14px; margin-bottom: 16px; background: #FEFDFB;
+  }
+  input:focus { border-color: var(--sage); outline: none; box-shadow: 0 0 0 3px var(--sage-tint); }
+  .btn {
+    width: 100%; padding: 11px; border-radius: 6px; font-weight: 600; font-size: 14px;
+    cursor: pointer; border: none; margin-bottom: 8px;
+  }
+  .btn-primary { background: var(--sage); color: #fff; }
+  .btn-primary:hover { background: var(--sage-dark); }
+  .btn-secondary { background: transparent; color: var(--ink-muted); border: 1px solid var(--line); }
+  .btn-secondary:hover { background: rgba(0,0,0,0.02); color: var(--ink); }
+</style>
+</head>
+<body>
+
+<div class="login-card">
+  <div class="brand-mark">P</div>
+  <h1>Dashboard Peribadi</h1>
+  <p>Sila log masuk untuk mengakses akaun anda.</p>
+
+  <label for="email">Emel</label>
+  <input type="email" id="email" placeholder="nama@emai.com">
+
+  <label for="password">Katalaluan</label>
+  <input type="password" id="password" placeholder="••••••••">
+
+  <button class="btn btn-primary" id="btnLogin">Log Masuk</button>
+  <button class="btn btn-secondary" id="btnSignUp">Daftar Akaun Baharu</button>
+</div>
+
+<script>
+  // TUKAR APi KEYS ANDA DI SINI
+  const SUPABASE_URL = 'https://xufwnjjnuqtkfaelxqta.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_1Jm-VKyNa1CTPDbYIeDOwA_mI7zMZIc';
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // Jika sudah log masuk, terus bawa ke dashboard.html
+  async function checkSession() {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) window.location.href = 'dashboard.html';
+  }
+  checkSession();
+
+  document.getElementById("btnLogin").addEventListener("click", async () => {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) alert("Gagal Log Masuk: " + error.message);
+    else window.location.href = 'dashboard.html';
+  });
+
+  document.getElementById("btnSignUp").addEventListener("click", async () => {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const { error } = await supabase.auth.signUp({ email, password });
+    if (error) alert("Gagal Mendaftar: " + error.message);
+    else alert("Pendaftaran berjaya! Sila semak emel anda untuk pengesahan.");
+  });
+</script>
+</body>
+</html>
