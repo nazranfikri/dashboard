@@ -3,20 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Peribadi</title>
+<title>Dashboard Peribadi - nspace</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
   :root{
     --bg:#F7F4EC; --paper:#FFFFFF; --ink:#242A24; --ink-muted:#6E7268;
     --ink-faint:#A3A69B; --line:#E4DFCF; --sage:#3F6C51; --sage-dark:#2C4E39;
-    --sage-tint:#E7EFE6; --gold:#B4813C; --gold-tint:#F5E9D6; --danger:#B3503F;
+    --sage-tint:#E7EFE6; --danger:#B3503F;
     --radius-sm:6px; --radius-md:10px; --radius-lg:16px;
     --shadow:0 1px 2px rgba(36,42,36,0.04), 0 4px 16px rgba(36,42,36,0.04);
+
+    /* Priority Colors */
+    --p-high-bg: #FDF2F2; --p-high-border: #B3503F; --p-high-text: #9B1C1C;
+    --p-medium-bg: #FEF8EE; --p-medium-border: #B4813C; --p-medium-text: #713F12;
+    --p-low-bg: #EBF8FF; --p-low-border: #2B6CB0; --p-low-text: #1C5980;
+    --p-done-bg: #F0FDF4; --p-done-border: #2F855A; --p-done-text: #22543D;
   }
+
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
@@ -40,7 +47,6 @@
   .app.collapsed .sidebar .user-email,
   .app.collapsed .sidebar .nav-text,
   .app.collapsed .sidebar .btn-text { display: none; }
-  .app.collapsed .sidebar .brand-mark { margin-bottom: 0; }
   .app.collapsed .sidebar .user-profile-badge { text-align: center; padding: 8px 4px; }
 
   .sidebar-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
@@ -64,7 +70,7 @@
   .nav-item{
     display:flex; align-items:center; gap:12px; padding:10px 12px;
     border:none; background:none; border-radius:var(--radius-sm); color:var(--ink-muted);
-    font-size:14px; font-weight:500; text-align:left; cursor:pointer;
+    font-size:13.5px; font-weight:500; text-align:left; cursor:pointer;
   }
   .nav-item svg{width:18px;height:18px; flex-shrink:0;}
   .nav-item:hover{background:rgba(63,108,81,0.07); color:var(--ink);}
@@ -86,7 +92,7 @@
   .view-header p{margin:4px 0 0; font-size:13.5px; color:var(--ink-muted);}
   .card{ background:var(--paper); border:1px solid var(--line); border-radius:var(--radius-lg); box-shadow:var(--shadow); }
 
-  /* Form & Fields */
+  /* Forms & Inputs */
   label{ display:block; font-size:12px; font-weight:600; color:var(--ink-muted); margin-bottom:6px; }
   input, select, textarea{
     width:100%; padding:9px 12px; border:1px solid var(--line); border-radius:var(--radius-sm);
@@ -103,34 +109,35 @@
   .btn-primary{background:var(--sage); border-color:var(--sage); color:#fff;}
   .btn-primary:hover{background:var(--sage-dark);}
 
-  /* Task Filters & Badges */
-  .filter-bar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
-  .filter-chip { 
-    padding: 6px 14px; border-radius: 99px; border: 1px solid var(--line); 
-    background: var(--paper); font-size: 12.5px; cursor: pointer; color: var(--ink-muted);
+  /* Excel Style Table & Priority Sections */
+  .priority-section { margin-bottom: 28px; }
+  .priority-title-bar { 
+    display: flex; align-items: center; justify-content: space-between; 
+    padding: 10px 16px; border-radius: var(--radius-sm); margin-bottom: 10px; font-weight: 700; font-size: 14px;
   }
-  .filter-chip.active { background: var(--sage); color: #fff; border-color: var(--sage); }
+  .priority-title-bar.high { background: var(--p-high-bg); color: var(--p-high-text); border-left: 5px solid var(--p-high-border); }
+  .priority-title-bar.medium { background: var(--p-medium-bg); color: var(--p-medium-text); border-left: 5px solid var(--p-medium-border); }
+  .priority-title-bar.low { background: var(--p-low-bg); color: var(--p-low-text); border-left: 5px solid var(--p-low-border); }
 
-  .badge { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; display: inline-block; }
-  .badge-p-high { background: #FDE8E8; color: #9B1C1C; }
-  .badge-p-medium { background: #FEF08A; color: #713F12; }
-  .badge-p-low { background: #E1EFFE; color: #1E429F; }
-  .badge-cat { background: var(--sage-tint); color: var(--sage-dark); }
-
-  /* Task List Item */
-  .add-form{padding:20px; margin-bottom:20px;}
-  .task-list{display:flex; flex-direction:column; gap:8px;}
-  .task-item{ display:flex; align-items:flex-start; gap:12px; padding:14px 16px; }
-  .task-check{ width:18px; height:18px; margin-top:2px; accent-color:var(--sage); cursor:pointer; }
-  .task-body{flex:1; min-width:0;}
-  .task-header-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap; }
-  .task-title{font-size:14px; font-weight:600; margin:0;}
-  .task-remark{font-size:12.5px; color:var(--ink-muted); margin:0; line-height:1.4;}
-  .task-item.done .task-title, .task-item.done .task-remark { color:var(--ink-faint); text-decoration:line-through; }
-  .task-actions { display: flex; gap: 4px; }
+  .task-table { width: 100%; border-collapse: collapse; font-size: 13.5px; background: var(--paper); border-radius: var(--radius-md); overflow: hidden; }
+  .task-table th, .task-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--line); }
+  .task-table th { background: #FAF8F5; font-size: 12px; font-weight: 600; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .task-table tr:last-child td { border-bottom: none; }
   
-  .icon-btn{ border:none; background:none; color:var(--ink-faint); padding:4px 6px; border-radius:var(--radius-sm); cursor:pointer; font-size: 12px; }
-  .icon-btn:hover{color:var(--ink); background:var(--line);}
+  /* Row Colors */
+  .task-row-high { border-left: 4px solid var(--p-high-border); }
+  .task-row-medium { border-left: 4px solid var(--p-medium-border); }
+  .task-row-low { border-left: 4px solid var(--p-low-border); }
+  .task-row-completed { border-left: 4px solid var(--p-done-border); background: var(--p-done-bg) !important; opacity: 0.75; }
+  .task-row-completed .task-title-text { text-decoration: line-through; color: var(--ink-faint); }
+
+  /* Badges */
+  .badge { padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; text-transform: uppercase; display: inline-block; }
+  .badge-high { background: var(--p-high-bg); color: var(--p-high-text); border: 1px solid var(--p-high-border); }
+  .badge-medium { background: var(--p-medium-bg); color: var(--p-medium-text); border: 1px solid var(--p-medium-border); }
+  .badge-low { background: var(--p-low-bg); color: var(--p-low-text); border: 1px solid var(--p-low-border); }
+  .badge-completed { background: var(--p-done-bg); color: var(--p-done-text); border: 1px solid var(--p-done-border); }
+  .badge-cat { background: var(--sage-tint); color: var(--sage-dark); font-weight: 600; }
 
   /* Modal Edit */
   .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; z-index: 100; }
@@ -141,6 +148,7 @@
 <body>
 
 <div class="app">
+  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-header">
       <div class="brand">
@@ -161,9 +169,13 @@
     </div>
 
     <nav>
-      <button class="nav-item active" data-view="todo">
+      <button class="nav-item active" data-view="add-task">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span class="nav-text">Tambah Tugasan</span>
+      </button>
+      <button class="nav-item" data-view="priority-board">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l2 2 4-4"/><rect x="3" y="4" width="18" height="16" rx="2"/></svg>
-        <span class="nav-text">Tugasan</span>
+        <span class="nav-text">Papan Keutamaan</span>
       </button>
       <button class="nav-item" data-view="contacts">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>
@@ -184,21 +196,23 @@
     </div>
   </aside>
 
+  <!-- MAIN CONTENT -->
   <main>
-    <!-- TODO VIEW -->
-    <section class="view active" id="view-todo">
+    <!-- PAGE 1: TAMBAH TUGASAN -->
+    <section class="view active" id="view-add-task">
       <div class="view-header">
-        <h2>Senarai Tugasan</h2>
-        <p>Urus tugas harian, keutamaan dan kategori.</p>
+        <h2>Borang Masukan Tugasan</h2>
+        <p>Tambah tugasan baharu ke dalam senarai sebelum disusulkan ke Papan Keutamaan.</p>
       </div>
 
-      <!-- Form Tambah -->
-      <div class="card add-form">
+      <div class="card" style="padding:24px; max-width:650px;">
         <div class="form-row">
           <div class="form-col" style="flex:2;">
-            <label>Tugasan</label>
-            <input type="text" id="taskTitle" placeholder="Tajuk tugasan baharu...">
+            <label>Tajuk Tugasan *</label>
+            <input type="text" id="taskTitle" placeholder="Contoh: Kemaskini penyata kewangan...">
           </div>
+        </div>
+        <div class="form-row">
           <div class="form-col">
             <label>Kategori</label>
             <select id="taskCategory">
@@ -210,48 +224,120 @@
             </select>
           </div>
           <div class="form-col">
-            <label>Priority</label>
+            <label>Tahap Keutamaan (Priority)</label>
             <select id="taskPriority">
-              <option value="High">High</option>
-              <option value="Medium" selected>Medium</option>
-              <option value="Low">Low</option>
+              <option value="High">High (Tinggi)</option>
+              <option value="Medium" selected>Medium (Sederhana)</option>
+              <option value="Low">Low (Rendah)</option>
             </select>
           </div>
         </div>
-        <div class="form-row">
+        <div class="form-row" style="margin-bottom:20px;">
           <div class="form-col">
-            <label>Catatan / Nota</label>
-            <input type="text" id="taskRemark" placeholder="Nota tambahan (opsional)...">
+            <label>Catatan / Nota Tambahan</label>
+            <textarea id="taskRemark" rows="3" placeholder="Masukkan nota atau arahan lanjut jika ada..."></textarea>
           </div>
         </div>
-        <button class="btn btn-primary" id="addTaskBtn">Tambah Tugasan</button>
+        <button class="btn btn-primary" id="addTaskBtn" style="width:100%; justify-content:center;">Simpan Tugasan Baharu</button>
       </div>
-
-      <!-- Filter Bar -->
-      <div class="filter-bar">
-        <span style="font-size:12px; font-weight:600; color:var(--ink-muted); margin-right:4px;">Tapis:</span>
-        <button class="filter-chip active" data-filter="All">Semua</button>
-        <button class="filter-chip" data-filter="Kerja">Kerja</button>
-        <button class="filter-chip" data-filter="Peribadi">Peribadi</button>
-        <button class="filter-chip" data-filter="Projek">Projek</button>
-        <button class="filter-chip" data-filter="Kewangan">Kewangan</button>
-      </div>
-
-      <!-- List -->
-      <div class="task-list card" id="taskList" style="padding:10px;"></div>
     </section>
 
-    <!-- CONTACTS VIEW -->
+    <!-- PAGE 2: PAPAN KEUTAMAAN (PRIORITY BOARD VIEW) -->
+    <section class="view" id="view-priority-board">
+      <div class="view-header" style="display:flex; justify-content:space-between; align-items:flex-end;">
+        <div>
+          <h2>Papan Keutamaan Tugasan</h2>
+          <p>Disusun mengikut tahap keutamaan (High $\rightarrow$ Medium $\rightarrow$ Low) dan berpenapis.</p>
+        </div>
+        <!-- EXCEL STYLE FILTER -->
+        <div style="width:220px;">
+          <label style="margin-bottom:4px;">Filter Kategori:</label>
+          <select id="categoryFilter" style="background:var(--paper); border-color:var(--sage);">
+            <option value="All">Semua Kategori</option>
+            <option value="Kerja">Kerja</option>
+            <option value="Peribadi">Peribadi</option>
+            <option value="Projek">Projek</option>
+            <option value="Kewangan">Kewangan</option>
+            <option value="Lain-lain">Lain-lain</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- High Priority Container -->
+      <div class="priority-section">
+        <div class="priority-title-bar high">
+          <span>HIGH PRIORITY (Tinggi)</span>
+          <span id="count-high" style="font-size:12px;">0 Tugasan</span>
+        </div>
+        <div class="card" style="overflow:hidden;">
+          <table class="task-table">
+            <thead>
+              <tr>
+                <th style="width:40px;">Status</th>
+                <th>Kategori</th>
+                <th>Tugasan / Catatan</th>
+                <th style="width:100px; text-align:right;">Tindakan</th>
+              </tr>
+            </thead>
+            <tbody id="list-high"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Medium Priority Container -->
+      <div class="priority-section">
+        <div class="priority-title-bar medium">
+          <span>MEDIUM PRIORITY (Sederhana)</span>
+          <span id="count-medium" style="font-size:12px;">0 Tugasan</span>
+        </div>
+        <div class="card" style="overflow:hidden;">
+          <table class="task-table">
+            <thead>
+              <tr>
+                <th style="width:40px;">Status</th>
+                <th>Kategori</th>
+                <th>Tugasan / Catatan</th>
+                <th style="width:100px; text-align:right;">Tindakan</th>
+              </tr>
+            </thead>
+            <tbody id="list-medium"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Low Priority Container -->
+      <div class="priority-section">
+        <div class="priority-title-bar low">
+          <span>LOW PRIORITY (Rendah)</span>
+          <span id="count-low" style="font-size:12px;">0 Tugasan</span>
+        </div>
+        <div class="card" style="overflow:hidden;">
+          <table class="task-table">
+            <thead>
+              <tr>
+                <th style="width:40px;">Status</th>
+                <th>Kategori</th>
+                <th>Tugasan / Catatan</th>
+                <th style="width:100px; text-align:right;">Tindakan</th>
+              </tr>
+            </thead>
+            <tbody id="list-low"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 3: KENALAN -->
     <section class="view" id="view-contacts">
       <div class="view-header"><h2>Kenalan</h2><p>Simpan senarai kenalan anda.</p></div>
-      <div class="card add-form">
+      <div class="card" style="padding:20px; margin-bottom:20px;">
         <div class="form-row">
           <div class="form-col"><label>Nama</label><input type="text" id="cName"></div>
           <div class="form-col"><label>Emel</label><input type="email" id="cEmail"></div>
         </div>
         <button class="btn btn-primary" id="addContactBtn">Tambah Kenalan</button>
       </div>
-      <div id="contactGrid" class="task-list card" style="padding:10px;"></div>
+      <div id="contactGrid" class="card" style="padding:20px;"></div>
     </section>
   </main>
 </div>
@@ -287,7 +373,7 @@
     </div>
     <div style="margin-bottom:16px;">
       <label>Catatan</label>
-      <input type="text" id="editTaskRemark">
+      <textarea id="editTaskRemark" rows="3"></textarea>
     </div>
     <div style="display:flex; justify-content:flex-end; gap:8px;">
       <button class="btn" id="closeModalBtn">Batal</button>
@@ -306,14 +392,14 @@
 
   let currentUser = null;
   let tasksState = [];
-  let currentFilter = "All";
+  let selectedCategory = "All";
 
-  // --- 1. COLLAPSE SIDEBAR ---
+  // --- COLLAPSE SIDEBAR ---
   document.getElementById("toggleSidebar").addEventListener("click", () => {
     document.querySelector(".app").classList.toggle("collapsed");
   });
 
-  // --- 2. GUARD ROUTE ---
+  // --- ROUTE GUARD ---
   async function guardRoute() {
     const { data: { session }, error } = await supabase.auth.getSession();
     if (error || !session) {
@@ -332,77 +418,96 @@
     window.location.replace('index.html');
   });
 
-  // --- 3. LOAD & RENDER TASKS ---
+  // --- LOAD & RENDER TASKS ---
   async function loadTasks() {
     const { data } = await supabase.from('tasks').select('*').order('created_at', { ascending: false });
     tasksState = data || [];
-    renderTasks();
+    renderBoard();
   }
 
-  function renderTasks() {
-    const list = document.getElementById("taskList");
+  function renderBoard() {
     let filtered = tasksState;
-    if (currentFilter !== "All") {
-      filtered = tasksState.filter(t => (t.category || "Lain-lain") === currentFilter);
+    if (selectedCategory !== "All") {
+      filtered = tasksState.filter(t => (t.category || "Lain-lain") === selectedCategory);
     }
 
-    if (!filtered.length) {
-      list.innerHTML = `<p style="text-align:center; color:var(--ink-faint); padding:20px;">Tiada tugasan ditemui.</p>`;
+    const highTasks = filtered.filter(t => (t.priority || "Medium") === "High");
+    const mediumTasks = filtered.filter(t => (t.priority || "Medium") === "Medium");
+    const lowTasks = filtered.filter(t => (t.priority || "Medium") === "Low");
+
+    renderTableRows("list-high", highTasks, "high");
+    renderTableRows("list-medium", mediumTasks, "medium");
+    renderTableRows("list-low", lowTasks, "low");
+
+    document.getElementById("count-high").textContent = `${highTasks.length} Tugasan`;
+    document.getElementById("count-medium").textContent = `${mediumTasks.length} Tugasan`;
+    document.getElementById("count-low").textContent = `${lowTasks.length} Tugasan`;
+  }
+
+  function renderTableRows(elementId, tasks, priorityLevel) {
+    const container = document.getElementById(elementId);
+    if (!tasks.length) {
+      container.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--ink-faint); padding:16px;">Tiada tugasan rekod dalam bahagian ini.</td></tr>`;
       return;
     }
 
-    list.innerHTML = filtered.map(t => {
-      const p = t.priority || "Medium";
-      const c = t.category || "Lain-lain";
+    container.innerHTML = tasks.map(t => {
+      const isDone = t.completed;
+      const rowClass = isDone ? 'task-row-completed' : `task-row-${priorityLevel}`;
+      const badgeClass = isDone ? 'badge-completed' : `badge-${priorityLevel}`;
+      const badgeText = isDone ? 'SELESAI' : priorityLevel.toUpperCase();
+
       return `
-        <div class="task-item ${t.completed ? 'done' : ''}">
-          <input type="checkbox" class="task-check" ${t.completed ? 'checked' : ''} data-id="${t.id}">
-          <div class="task-body">
-            <div class="task-header-row">
-              <span class="badge badge-cat">${c}</span>
-              <span class="badge badge-p-${p.toLowerCase()}">${p}</span>
-              <p class="task-title">${t.title}</p>
-            </div>
-            ${t.remark ? `<p class="task-remark">${t.remark}</p>` : ''}
-          </div>
-          <div class="task-actions">
-            <button class="icon-btn edit-btn" data-id="${t.id}">Edit</button>
-            <button class="icon-btn delete-btn" data-id="${t.id}" style="color:var(--danger);">Padam</button>
-          </div>
-        </div>
+        <tr class="${rowClass}">
+          <td>
+            <input type="checkbox" class="task-check" ${isDone ? 'checked' : ''} data-id="${t.id}">
+          </td>
+          <td>
+            <span class="badge badge-cat">${t.category || 'Lain-lain'}</span>
+            <span class="badge ${badgeClass}" style="margin-left:4px;">${badgeText}</span>
+          </td>
+          <td>
+            <div class="task-title-text" style="font-weight:600; color:var(--ink);">${t.title}</div>
+            ${t.remark ? `<div style="font-size:12px; color:var(--ink-muted); margin-top:2px;">${t.remark}</div>` : ''}
+          </td>
+          <td style="text-align:right;">
+            <button class="btn edit-btn" data-id="${t.id}" style="padding:4px 8px; font-size:11px;">Edit</button>
+            <button class="btn delete-btn" data-id="${t.id}" style="padding:4px 8px; font-size:11px; color:var(--danger);">Padam</button>
+          </td>
+        </tr>
       `;
     }).join("");
 
-    // Attach Event Listeners
-    list.querySelectorAll(".task-check").forEach(cb => {
+    // Attach Action Events
+    container.querySelectorAll(".task-check").forEach(cb => {
       cb.addEventListener("change", async () => {
         const id = cb.dataset.id;
         const status = cb.checked;
         await supabase.from('tasks').update({ completed: status }).eq('id', id);
         const t = tasksState.find(x => x.id === id);
         if(t) t.completed = status;
-        renderTasks();
+        renderBoard();
       });
     });
 
-    list.querySelectorAll(".delete-btn").forEach(btn => {
+    container.querySelectorAll(".delete-btn").forEach(btn => {
       btn.addEventListener("click", async () => {
         const id = btn.dataset.id;
         await supabase.from('tasks').delete().eq('id', id);
         tasksState = tasksState.filter(x => x.id !== id);
-        renderTasks();
+        renderBoard();
       });
     });
 
-    list.querySelectorAll(".edit-btn").forEach(btn => {
+    container.querySelectorAll(".edit-btn").forEach(btn => {
       btn.addEventListener("click", () => openEditModal(btn.dataset.id));
     });
   }
 
-  // Add Task
+  // --- ADD TASK ---
   document.getElementById("addTaskBtn").addEventListener("click", async () => {
     const title = document.getElementById("taskTitle").value.trim();
-    if (!title) return;
+    if (!title) { alert("Sila masukkan tajuk tugasan."); return; }
 
     const newTask = {
       title,
@@ -416,23 +521,21 @@
     const { data } = await supabase.from('tasks').insert([newTask]).select();
     if (data) {
       tasksState.unshift(data[0]);
-      renderTasks();
       document.getElementById("taskTitle").value = "";
       document.getElementById("taskRemark").value = "";
+      alert("Tugasan berjaya disimpan!");
+      // Switch view to Priority Board automatically
+      document.querySelector('[data-view="priority-board"]').click();
     }
   });
 
-  // Filter Chips
-  document.querySelectorAll(".filter-chip").forEach(chip => {
-    chip.addEventListener("click", () => {
-      document.querySelectorAll(".filter-chip").forEach(c => c.classList.remove("active"));
-      chip.classList.add("active");
-      currentFilter = chip.dataset.filter;
-      renderTasks();
-    });
+  // --- FILTER EXCEL DROPDOWN ---
+  document.getElementById("categoryFilter").addEventListener("change", (e) => {
+    selectedCategory = e.target.value;
+    renderBoard();
   });
 
-  // --- 4. EDIT TASK MODAL ---
+  // --- EDIT MODAL ---
   const editModal = document.getElementById("editModal");
   function openEditModal(id) {
     const t = tasksState.find(x => x.id === id);
@@ -461,57 +564,40 @@
     if (idx !== -1) tasksState[idx] = { ...tasksState[idx], ...updates };
     
     editModal.classList.remove("active");
-    renderTasks();
+    renderBoard();
   });
 
-  // --- 5. FIX EXPORT & IMPORT DATA ---
+  // --- EXPORT & IMPORT BACKUP ---
   document.getElementById("exportBtn").addEventListener("click", async () => {
     const { data: tasks } = await supabase.from('tasks').select('*');
-    const { data: contacts } = await supabase.from('contacts').select('*');
-    
-    const backupData = {
-      exported_at: new Date().toISOString(),
-      user_email: currentUser.email,
-      tasks: tasks || [],
-      contacts: contacts || []
-    };
-
+    const backupData = { exported_at: new Date().toISOString(), user_email: currentUser.email, tasks: tasks || [] };
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", `nspace_backup_${Date.now()}.json`);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
+    const dlAnchor = document.createElement('a');
+    dlAnchor.setAttribute("href", dataStr);
+    dlAnchor.setAttribute("download", `nspace_backup_${Date.now()}.json`);
+    document.body.appendChild(dlAnchor);
+    dlAnchor.click();
+    dlAnchor.remove();
   });
 
-  document.getElementById("importBtn").addEventListener("click", () => {
-    document.getElementById("importFile").click();
-  });
-
+  document.getElementById("importBtn").addEventListener("click", () => document.getElementById("importFile").click());
   document.getElementById("importFile").addEventListener("change", (e) => {
-    const fileReader = new FileReader();
-    fileReader.onload = async (event) => {
+    const reader = new FileReader();
+    reader.onload = async (event) => {
       try {
-        const importedJson = JSON.parse(event.target.result);
-        if (importedJson.tasks && Array.isArray(importedJson.tasks)) {
-          const tasksToInsert = importedJson.tasks.map(t => {
-            delete t.id; // buang ID lama supaya Supabase jana UUID baharu
-            t.user_id = currentUser.id;
-            return t;
-          });
+        const json = JSON.parse(event.target.result);
+        if (json.tasks && Array.isArray(json.tasks)) {
+          const tasksToInsert = json.tasks.map(t => { delete t.id; t.user_id = currentUser.id; return t; });
           await supabase.from('tasks').insert(tasksToInsert);
         }
-        alert("Import data berjaya!");
+        alert("Import berjaya!");
         loadTasks();
-      } catch (err) {
-        alert("Fail JSON tidak sah!");
-      }
+      } catch (err) { alert("Fail JSON tidak sah!"); }
     };
-    if (e.target.files[0]) fileReader.readAsText(e.target.files[0]);
+    if (e.target.files[0]) reader.readAsText(e.target.files[0]);
   });
 
-  // Views Navigation
+  // --- NAVIGATION SWITCHER ---
   document.querySelectorAll(".nav-item").forEach(btn => {
     btn.addEventListener("click", () => {
       document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active"));
