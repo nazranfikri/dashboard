@@ -197,78 +197,75 @@
   </div>
 
   <script>
-    const SUPABASE_URL = 'https://xufwnjjnuqtkfaelxqta.supabase.co';
-    
-    // MASUKKAN ANON KEY SUPABASE ANDA YANG BERMULA DENGAN 'eyJhbGciOi...' DI SINI
-    const SUPABASE_ANON_KEY = 'sb_publishable_1Jm-VKyNa1CTPDbYIeDOwA_mI7zMZIc'; 
-    
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const SUPABASE_URL = 'https://xufwnjjnuqtkfaelxqta.supabase.co';
+  // Pastikan guna anon key sebenar (eyJhbGciOi...)
+  const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY_HERE'; 
+  
+  // Isytihar HANYA SEKALl di sini
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Semak sesi sedia ada
-    window.addEventListener('DOMContentLoaded', async () => {
-      try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        if (error) console.error("Ralat getSession:", error.message);
-        
-        if (session) {
-          window.location.replace('dashboard.html');
-        }
-      } catch (err) {
-        console.error("Gagal semak sesi:", err.message);
+  // Semak sesi sedia ada semasa dimuatkan
+  window.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const { data: { session }, error } = await supabaseClient.auth.getSession();
+      if (error) console.error("Ralat getSession:", error.message);
+      
+      if (session) {
+        window.location.replace('dashboard.html');
       }
-    });
+    } catch (err) {
+      console.error("Gagal semak sesi:", err.message);
+    }
+  });
 
-    // Fungsi Log Masuk Direct
-    async function handleLogin() {
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-      const btn = document.getElementById('btnLogin');
+  // Fungsi Log Masuk Direct
+  async function handleLogin() {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const btn = document.getElementById('btnLogin');
 
-      if (!email || !password) {
-        alert('Sila masukkan emel dan kata laluan.');
+    if (!email || !password) {
+      alert('Sila masukkan emel dan kata laluan.');
+      return;
+    }
+
+    btn.textContent = "Sedang Log Masuk...";
+    btn.disabled = true;
+
+    try {
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+
+      if (error) {
+        alert('Gagal Log Masuk: ' + error.message);
+        btn.textContent = "Log Masuk";
+        btn.disabled = false;
         return;
       }
 
-      btn.textContent = "Sedang Log Masuk...";
-      btn.disabled = true;
-
-      try {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: email,
-          password: password
-        });
-
-        if (error) {
-          alert('Gagal Log Masuk: ' + error.message);
-          btn.textContent = "Log Masuk";
-          btn.disabled = false;
-          return;
-        }
-
-        if (data && data.session) {
-          // Guna .replace() untuk elak isu back button di browser
-          window.location.replace('dashboard.html');
-        } else {
-          alert('Log masuk berjaya tetapi tiada sesi dikembalikan.');
-          btn.textContent = "Log Masuk";
-          btn.disabled = false;
-        }
-
-      } catch (err) {
-        alert('Ralat Sistem: ' + err.message);
+      if (data && data.session) {
+        window.location.replace('dashboard.html');
+      } else {
+        alert('Log masuk berjaya tetapi tiada sesi dikembalikan.');
         btn.textContent = "Log Masuk";
         btn.disabled = false;
       }
+
+    } catch (err) {
+      alert('Ralat Sistem: ' + err.message);
+      btn.textContent = "Log Masuk";
+      btn.disabled = false;
     }
+  }
 
-    document.getElementById('btnLogin').addEventListener('click', handleLogin);
+  // Event Listener
+  document.getElementById('btnLogin').addEventListener('click', handleLogin);
 
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        handleLogin();
-      }
-    });
-  </script>
-
-</body>
-</html>
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      handleLogin();
+    }
+  });
+</script>
