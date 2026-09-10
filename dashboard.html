@@ -399,23 +399,31 @@
     document.querySelector(".app").classList.toggle("collapsed");
   });
 
-  // --- ROUTE GUARD ---
+  // --- ROUTE GUARD (FIXED) ---
   async function guardRoute() {
-    const { data: { session }, error } = await supabase.auth.getSession();
-    if (error || !session) {
+    // Gunakan getUser() untuk pengesahan token yang lebih tepat
+    const { data: { user }, error } = await supabase.auth.getUser();
+
+    if (error || !user) {
+      // Jika tiada user, tendang ke index.html
       window.location.replace('index.html');
       return;
     }
-    currentUser = session.user;
+
+    // Jika user wujud, tetapkan data dan paparkan app
+    currentUser = user;
     document.getElementById("userEmailDisplay").textContent = currentUser.email;
     document.querySelector(".app").style.setProperty("display", "flex", "important");
+    
+    // Muat turun tugasan
     loadTasks();
   }
 
-  document.getElementById("btnLogout").addEventListener("click", async (e) => {
-    e.preventDefault();
-    await supabase.auth.signOut();
-    window.location.replace('index.html');
+  // Lengkapkan dengan listener untuk mengelakkan loop
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_OUT' || !session) {
+      window.location.replace('index.html');
+    }
   });
 
   // --- LOAD & RENDER TASKS ---
