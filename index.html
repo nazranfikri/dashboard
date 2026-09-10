@@ -44,7 +44,7 @@
       }
     }
 
-    /* Bahagian Visual - Guna Imej Unsplash Direct */
+    /* Bahagian Visual - Imej Unsplash Direct */
     .visual-section {
       background-color: #3F6C51;
       background-image: linear-gradient(135deg, rgba(63, 108, 81, 0.8), rgba(30, 55, 40, 0.88)), url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80');
@@ -223,20 +223,15 @@
   </div>
 
   <script>
+    // Konfigurasi Supabase
     const SUPABASE_URL = 'https://xufwnjjnuqtkfaelxqta.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_1Jm-VKyNa1CTPDbYIeDOwA_mI7zMZIc';
     
-    // Inisialisasi Supabase
-    let supabase;
-    try {
-      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    } catch (e) {
-      alert("Gagal memuatkan Supabase Client: " + e.message);
-    }
+    // Inisialisasi Supabase (Sekali sahaja)
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // 1. Semak sesi semasa dibuka
+    // 1. Semak sesi semasa dimuatkan
     window.addEventListener('DOMContentLoaded', async () => {
-      if (!supabase) return;
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) console.error("Error getSession:", error.message);
@@ -276,18 +271,18 @@
         } else if (data && data.session) {
           window.location.assign('dashboard.html');
         } else {
-          alert('Log masuk berjaya tetapi tiada data sesi dikembalikan.');
+          alert('Log masuk berjaya tetapi tiada sesi dikembalikan.');
           btn.textContent = "Log Masuk";
           btn.disabled = false;
         }
       } catch (err) {
-        alert('Ralat Sistem / Rangkaian: ' + err.message);
+        alert('Ralat Sistem: ' + err.message);
         btn.textContent = "Log Masuk";
         btn.disabled = false;
       }
     }
 
-    // Event Listener Butang & Kekunci Enter
+    // Event Listeners
     document.getElementById('btnLogin').addEventListener('click', doLogin);
     
     document.addEventListener('keydown', (e) => {
