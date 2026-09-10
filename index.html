@@ -66,33 +66,57 @@
 </div>
 
 <script>
-  // TUKAR APi KEYS ANDA DI SINI
-  const SUPABASE_URL = 'https://xufwnjjnuqtkfaelxqta.supabase.co';
-  const SUPABASE_ANON_KEY = 'sb_publishable_1Jm-VKyNa1CTPDbYIeDOwA_mI7zMZIc';
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  // Pastikan URL & ANON KEY anda betul di sini
+  const SUPABASE_URL = 'https://XXXXXXXXXXXXXX.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsIn...';
 
-  // Jika sudah log masuk, terus bawa ke dashboard.html
+  // HANYA ISYTIHAR SEKALI SAHAJA DI SINI:
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // Semak jika pengguna sudah log masuk
   async function checkSession() {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) window.location.href = 'dashboard.html';
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (session) {
+      window.location.href = 'dashboard.html';
+    }
   }
   checkSession();
 
+  // Log Masuk
   document.getElementById("btnLogin").addEventListener("click", async () => {
-    const email = document.getElementById("email").value;
+    const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) alert("Gagal Log Masuk: " + error.message);
-    else window.location.href = 'dashboard.html';
+
+    if (!email || !password) {
+      alert("Sila masukkan emel dan katalaluan.");
+      return;
+    }
+
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    
+    if (error) {
+      alert("Gagal Log Masuk: " + error.message);
+    } else if (data.session) {
+      window.location.href = 'dashboard.html';
+    }
   });
 
+  // Daftar Akaun
   document.getElementById("btnSignUp").addEventListener("click", async () => {
-    const email = document.getElementById("email").value;
+    const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
-    const { error } = await supabase.auth.signUp({ email, password });
-    if (error) alert("Gagal Mendaftar: " + error.message);
-    else alert("Pendaftaran berjaya! Sila semak emel anda untuk pengesahan.");
+
+    if (!email || !password) {
+      alert("Sila masukkan emel dan katalaluan untuk mendaftar.");
+      return;
+    }
+
+    const { error } = await supabaseClient.auth.signUp({ email, password });
+    
+    if (error) {
+      alert("Gagal Mendaftar: " + error.message);
+    } else {
+      alert("Pendaftaran berjaya! Sila semak emel anda untuk sahkan akaun.");
+    }
   });
 </script>
-</body>
-</html>
