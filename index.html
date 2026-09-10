@@ -21,85 +21,72 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 16px;
     }
 
-    /* Kad Utama Log Masuk */
-    .login-card {
+    .login-wrapper {
       background: #FFFFFF;
       width: 100%;
-      max-width: 920px;
-      border-radius: 20px;
-      box-shadow: 0 20px 40px rgba(63, 108, 81, 0.08), 0 1px 3px rgba(0,0,0,0.05);
+      max-width: 880px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      border: 1px solid rgba(63, 108, 81, 0.1);
     }
 
     @media (min-width: 768px) {
-      .login-card {
+      .login-wrapper {
         flex-direction: row;
-        min-height: 520px;
       }
     }
 
-    /* Bahagian Visual - Imej Unsplash Direct */
-    .visual-section {
+    /* Bahagian Grafik Gambar Basikal */
+    .graphic-section {
       background-color: #3F6C51;
-      background-image: linear-gradient(135deg, rgba(63, 108, 81, 0.8), rgba(30, 55, 40, 0.88)), url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80');
+      background-image: url('https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=800&q=80');
       background-size: cover;
       background-position: center;
-      padding: 40px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+      min-height: 220px;
       position: relative;
-      min-height: 240px;
+      display: flex;
+      align-items: flex-end;
+      padding: 24px;
     }
 
     @media (min-width: 768px) {
-      .visual-section {
-        width: 48%;
+      .graphic-section {
+        width: 50%;
+        min-height: 480px;
       }
     }
 
-    .brand-badge {
-      display: inline-block;
-      background: rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+    .graphic-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.6) 100%);
+    }
+
+    .graphic-text {
+      position: relative;
+      z-index: 1;
       color: #FFFFFF;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 0.85rem;
+    }
+
+    .graphic-text h3 {
+      font-size: 1.5rem;
       font-weight: 600;
-      letter-spacing: 0.5px;
-      width: fit-content;
-      border: 1px solid rgba(255, 255, 255, 0.3);
+      margin-bottom: 4px;
     }
 
-    .visual-text {
-      color: #FFFFFF;
-      margin-top: auto;
-    }
-
-    .visual-text h1 {
-      font-size: 2rem;
-      font-weight: 700;
-      line-height: 1.2;
-      margin-bottom: 12px;
-    }
-
-    .visual-text p {
-      font-size: 0.95rem;
+    .graphic-text p {
+      font-size: 0.875rem;
       opacity: 0.9;
-      line-height: 1.5;
     }
 
-    /* Bahagian Borang */
+    /* Bahagian Borang Log Masuk */
     .form-section {
-      padding: 40px 32px;
+      padding: 32px 24px;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -107,134 +94,122 @@
 
     @media (min-width: 768px) {
       .form-section {
-        width: 52%;
+        width: 50%;
         padding: 48px;
       }
     }
 
-    .form-header {
-      margin-bottom: 32px;
-    }
-
-    .form-header h2 {
+    .brand-title {
       font-size: 1.75rem;
       font-weight: 700;
       color: #1A202C;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
 
-    .form-header p {
-      font-size: 0.9rem;
+    .brand-subtitle {
+      font-size: 0.875rem;
       color: #718096;
+      margin-bottom: 28px;
     }
 
     .form-group {
-      margin-bottom: 22px;
+      margin-bottom: 20px;
     }
 
     .form-group label {
       display: block;
-      font-size: 0.85rem;
+      font-size: 0.875rem;
       font-weight: 600;
-      color: #2D3748;
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      color: #4A5568;
+      margin-bottom: 6px;
     }
 
     .form-group input {
       width: 100%;
-      padding: 13px 16px;
-      border: 1.5px solid #E2E8F0;
-      border-radius: 10px;
-      font-size: 0.95rem;
+      padding: 12px 14px;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      font-size: 1rem;
       background-color: #FAFAFA;
-      transition: all 0.25s ease;
-      color: #2D3748;
-      -webkit-appearance: none;
+      transition: all 0.2s ease;
+      -webkit-appearance: none; /* Kemas untuk iOS Safari */
     }
 
     .form-group input:focus {
       outline: none;
       border-color: #3F6C51;
       background-color: #FFFFFF;
-      box-shadow: 0 0 0 4px rgba(63, 108, 81, 0.12);
+      box-shadow: 0 0 0 3px rgba(63, 108, 81, 0.15);
     }
 
     .btn-submit {
       width: 100%;
-      padding: 14px;
+      padding: 12px;
       background-color: #3F6C51;
       color: #FFFFFF;
       font-size: 1rem;
       font-weight: 600;
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
       cursor: pointer;
-      transition: all 0.2s ease;
-      margin-top: 10px;
-      box-shadow: 0 4px 12px rgba(63, 108, 81, 0.25);
+      transition: background-color 0.2s ease;
+      margin-top: 8px;
     }
 
     .btn-submit:hover {
-      background-color: #31553f;
-      transform: translateY(-1px);
+      background-color: #2F523D;
     }
 
     .btn-submit:disabled {
       background-color: #A0AEC0;
-      box-shadow: none;
       cursor: not-allowed;
-      transform: none;
     }
   </style>
 </head>
 <body>
 
-  <div class="login-card">
-    <div class="visual-section">
-      <span class="brand-badge">nspace</span>
-      <div class="visual-text">
-        <h1>Selamat Kembali</h1>
-        <p>Akses ruang kerja dan urus tugasan anda dengan lebih teratur.</p>
+  <div class="login-wrapper">
+    <!-- Kad Grafik (Gambar Basikal) -->
+    <div class="graphic-section">
+      <div class="graphic-overlay"></div>
+      <div class="graphic-text">
+        <h3>nspace</h3>
+        <p>Sistem Pengurusan Tugasan & Projek</p>
       </div>
     </div>
 
+    <!-- Kad Borang Login -->
     <div class="form-section">
-      <div class="form-header">
-        <h2>Log Masuk</h2>
-        <p>Masukkan butiran akaun anda di bawah.</p>
-      </div>
+      <h2 class="brand-title">Log Masuk</h2>
+      <p class="brand-subtitle">Masukkan emel dan kata laluan anda untuk meneruskan.</p>
 
-      <div class="login-form">
+      <form id="loginForm">
         <div class="form-group">
           <label for="email">Emel</label>
-          <input type="email" id="email" placeholder="nama@email.com" autocomplete="email">
+          <input type="email" id="email" required placeholder="nama@email.com" autocomplete="email">
         </div>
 
         <div class="form-group">
           <label for="password">Kata Laluan</label>
-          <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+          <input type="password" id="password" required placeholder="••••••••" autocomplete="current-password">
         </div>
 
-        <button type="button" id="btnLogin" class="btn-submit">Log Masuk</button>
-      </div>
+        <button type="submit" id="btnLogin" class="btn-submit">Log Masuk</button>
+      </form>
     </div>
   </div>
 
   <script>
-    // Konfigurasi Supabase
+    // Konfigurasi Supabase Anda
     const SUPABASE_URL = 'https://xufwnjjnuqtkfaelxqta.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_1Jm-VKyNa1CTPDbYIeDOwA_mI7zMZIc';
-    
-    // Inisialisasi Supabase (Sekali sahaja)
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // 1. Semak sesi semasa dimuatkan
+    // 1. Semak sesi semasa dibuka (Mesra Pelayar Telefon)
     window.addEventListener('DOMContentLoaded', async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
-        if (error) console.error("Error getSession:", error.message);
+        if (error) throw error;
         
         if (session) {
           window.location.assign('dashboard.html');
@@ -244,16 +219,13 @@
       }
     });
 
-    // 2. Fungsi Log Masuk
-    async function doLogin() {
+    // 2. Proses Log Masuk
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
       const btn = document.getElementById('btnLogin');
-
-      if (!email || !password) {
-        alert('Sila masukkan emel dan kata laluan.');
-        return;
-      }
 
       btn.textContent = "Sedang Log Masuk...";
       btn.disabled = true;
@@ -268,26 +240,14 @@
           alert('Gagal Log Masuk: ' + error.message);
           btn.textContent = "Log Masuk";
           btn.disabled = false;
-        } else if (data && data.session) {
+        } else if (data.session) {
+          // Guna .assign() supaya lancar di Safari & Chrome Mobile
           window.location.assign('dashboard.html');
-        } else {
-          alert('Log masuk berjaya tetapi tiada sesi dikembalikan.');
-          btn.textContent = "Log Masuk";
-          btn.disabled = false;
         }
       } catch (err) {
         alert('Ralat Sistem: ' + err.message);
         btn.textContent = "Log Masuk";
         btn.disabled = false;
-      }
-    }
-
-    // Event Listeners
-    document.getElementById('btnLogin').addEventListener('click', doLogin);
-    
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        doLogin();
       }
     });
   </script>
