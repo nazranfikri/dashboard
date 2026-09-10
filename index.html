@@ -44,10 +44,10 @@
       }
     }
 
-    /* Bahagian Visual & Gambar 'background1.png' */
+    /* Bahagian Visual - Guna Imej Unsplash Direct */
     .visual-section {
       background-color: #3F6C51;
-      background-image: linear-gradient(135deg, rgba(63, 108, 81, 0.75), rgba(30, 55, 40, 0.85)), url('background1.png');
+      background-image: linear-gradient(135deg, rgba(63, 108, 81, 0.8), rgba(30, 55, 40, 0.88)), url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80');
       background-size: cover;
       background-position: center;
       padding: 40px;
@@ -97,7 +97,7 @@
       line-height: 1.5;
     }
 
-    /* Bahagian Borang Log Masuk */
+    /* Bahagian Borang */
     .form-section {
       padding: 40px 32px;
       display: flex;
@@ -161,7 +161,6 @@
       box-shadow: 0 0 0 4px rgba(63, 108, 81, 0.12);
     }
 
-    /* Butang Log Masuk */
     .btn-submit {
       width: 100%;
       padding: 14px;
@@ -180,11 +179,6 @@
     .btn-submit:hover {
       background-color: #31553f;
       transform: translateY(-1px);
-      box-shadow: 0 6px 16px rgba(63, 108, 81, 0.35);
-    }
-
-    .btn-submit:active {
-      transform: translateY(0);
     }
 
     .btn-submit:disabled {
@@ -198,7 +192,6 @@
 <body>
 
   <div class="login-card">
-    <!-- Visual Bahagian Kiri / Atas (Gambar background1.png) -->
     <div class="visual-section">
       <span class="brand-badge">nspace</span>
       <div class="visual-text">
@@ -207,14 +200,12 @@
       </div>
     </div>
 
-    <!-- Bahagian Borang Log Masuk -->
     <div class="form-section">
       <div class="form-header">
         <h2>Log Masuk</h2>
         <p>Masukkan butiran akaun anda di bawah.</p>
       </div>
 
-      <!-- Menggunakan div (bukan form) untuk elak isu URL /? -->
       <div class="login-form">
         <div class="form-group">
           <label for="email">Emel</label>
@@ -232,16 +223,23 @@
   </div>
 
   <script>
-    // Konfigurasi Supabase
     const SUPABASE_URL = 'https://xufwnjjnuqtkfaelxqta.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_1Jm-VKyNa1CTPDbYIeDOwA_mI7zMZIc';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    // Inisialisasi Supabase
+    let supabase;
+    try {
+      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } catch (e) {
+      alert("Gagal memuatkan Supabase Client: " + e.message);
+    }
 
     // 1. Semak sesi semasa dibuka
     window.addEventListener('DOMContentLoaded', async () => {
+      if (!supabase) return;
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
-        if (error) throw error;
+        if (error) console.error("Error getSession:", error.message);
         
         if (session) {
           window.location.assign('dashboard.html');
@@ -251,8 +249,8 @@
       }
     });
 
-    // 2. Proses Log Masuk apabila butang ditekan
-    document.getElementById('btnLogin').addEventListener('click', async () => {
+    // 2. Fungsi Log Masuk
+    async function doLogin() {
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
       const btn = document.getElementById('btnLogin');
@@ -275,20 +273,26 @@
           alert('Gagal Log Masuk: ' + error.message);
           btn.textContent = "Log Masuk";
           btn.disabled = false;
-        } else if (data.session) {
+        } else if (data && data.session) {
           window.location.assign('dashboard.html');
+        } else {
+          alert('Log masuk berjaya tetapi tiada data sesi dikembalikan.');
+          btn.textContent = "Log Masuk";
+          btn.disabled = false;
         }
       } catch (err) {
-        alert('Ralat Sistem: ' + err.message);
+        alert('Ralat Sistem / Rangkaian: ' + err.message);
         btn.textContent = "Log Masuk";
         btn.disabled = false;
       }
-    });
+    }
 
-    // Sokongan untuk kekunci 'Enter'
-    document.addEventListener('keypress', (e) => {
+    // Event Listener Butang & Kekunci Enter
+    document.getElementById('btnLogin').addEventListener('click', doLogin);
+    
+    document.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
-        document.getElementById('btnLogin').click();
+        doLogin();
       }
     });
   </script>
