@@ -132,7 +132,6 @@
       font-size: 1rem;
       background-color: #FAFAFA;
       transition: all 0.2s ease;
-      -webkit-appearance: none; /* Kemas untuk iOS Safari */
     }
 
     .form-group input:focus {
@@ -200,26 +199,25 @@
   </div>
 
   <script>
-    // Konfigurasi Supabase Anda
     const SUPABASE_URL = 'https://xufwnjjnuqtkfaelxqta.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh1ZnduampudXF0a2ZhZWx4cXRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg5Mzc3NDcsImV4cCI6MjEwNDUxMzc0N30.6PoQb6jAuPIHbdn4TbVWcvAiBLDHvULiUafdFdIfYwg';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh1ZnduampudXF0a2ZhZWx4cXRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg5Mzc3NDcsImV4cCI6MjEwNDUxMzc0N30.6PoQb6jAuPIHbdn4TbVWcvAiBLDHvULiUafdFdIfYwg'; 
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // 1. Semak sesi semasa dibuka (Mesra Pelayar Telefon)
+    // Semak sesi sedia ada
     window.addEventListener('DOMContentLoaded', async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
-        if (error) throw error;
+        if (error) console.error("Ralat getSession:", error.message);
         
         if (session) {
-          window.location.assign('dashboard.html');
+          window.location.href = 'dashboard.html';
         }
       } catch (err) {
         console.error("Gagal semak sesi:", err.message);
       }
     });
 
-    // 2. Proses Log Masuk
+    // Proses Log Masuk Standard
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
 
@@ -240,10 +238,17 @@
           alert('Gagal Log Masuk: ' + error.message);
           btn.textContent = "Log Masuk";
           btn.disabled = false;
-        } else if (data.session) {
-          // Guna .assign() supaya lancar di Safari & Chrome Mobile
-          window.location.assign('dashboard.html');
+          return;
         }
+
+        if (data && data.session) {
+          window.location.href = 'dashboard.html';
+        } else {
+          alert('Log masuk berjaya tetapi tiada sesi dikembalikan.');
+          btn.textContent = "Log Masuk";
+          btn.disabled = false;
+        }
+
       } catch (err) {
         alert('Ralat Sistem: ' + err.message);
         btn.textContent = "Log Masuk";
