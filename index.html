@@ -168,7 +168,6 @@
 <body>
 
   <div class="login-wrapper">
-    <!-- Kad Grafik (Gambar Basikal) -->
     <div class="graphic-section">
       <div class="graphic-overlay"></div>
       <div class="graphic-text">
@@ -177,7 +176,6 @@
       </div>
     </div>
 
-    <!-- Kad Borang Login (Tanpa Tag <form> Untuk Elak Reload) -->
     <div class="form-section">
       <h2 class="brand-title">Log Masuk</h2>
       <p class="brand-subtitle">Masukkan emel dan kata laluan anda untuk meneruskan.</p>
@@ -200,18 +198,20 @@
 
   <script>
     const SUPABASE_URL = 'https://xufwnjjnuqtkfaelxqta.supabase.co';
-    // Sila pastikan kekunci anon di bawah adalah tepat dari Supabase Dashboard
+    
+    // MASUKKAN ANON KEY SUPABASE ANDA YANG BERMULA DENGAN 'eyJhbGciOi...' DI SINI
     const SUPABASE_ANON_KEY = 'sb_publishable_1Jm-VKyNa1CTPDbYIeDOwA_mI7zMZIc'; 
+    
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Semak sesi sedia ada semasa dimuatkan
+    // Semak sesi sedia ada
     window.addEventListener('DOMContentLoaded', async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) console.error("Ralat getSession:", error.message);
         
         if (session) {
-          window.location.href = 'dashboard.html';
+          window.location.replace('dashboard.html');
         }
       } catch (err) {
         console.error("Gagal semak sesi:", err.message);
@@ -246,7 +246,8 @@
         }
 
         if (data && data.session) {
-          window.location.href = 'dashboard.html';
+          // Guna .replace() untuk elak isu back button di browser
+          window.location.replace('dashboard.html');
         } else {
           alert('Log masuk berjaya tetapi tiada sesi dikembalikan.');
           btn.textContent = "Log Masuk";
@@ -260,10 +261,8 @@
       }
     }
 
-    // Event Listener Klik Butang
     document.getElementById('btnLogin').addEventListener('click', handleLogin);
 
-    // Event Listener Tekan Kunci Enter
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         handleLogin();
